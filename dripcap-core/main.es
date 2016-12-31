@@ -23,6 +23,8 @@ app.on('ready', () => {
 
   let mainWindow = new BrowserWindow(options);
   mainWindow.loadURL(`file://${__dirname}/layout.htm`);
+  mainWindow.webContents.on('crashed', () => mainWindow.reload());
+  mainWindow.webContents.on('unresponsive', () => mainWindow.reload());
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.executeJavaScript(`require("./dripcap")(${argv}, "default")`, false).then(() => {
       mainWindow.show();
