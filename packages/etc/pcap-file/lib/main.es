@@ -7,6 +7,7 @@ const {dialog} = remote;
 import { Session, Menu, KeyBind, PubSub, Logger, Argv } from 'dripcap';
 
 let pcapFiles = [];
+let selectedSession = null;
 
 for (let file of Argv._) {
   if (file.endsWith('.pcap')) {
@@ -102,12 +103,18 @@ export default class PcapFile {
     pcapFiles = [];
 
     KeyBind.bind('command+o', '!menu', 'pcap-file:open');
+    KeyBind.bind('command+s', '!menu', 'pcap-file:save');
 
     this.fileMenu = function(menu, e) {
       menu.append(new MenuItem({
         label: 'Import Pcap File...',
         accelerator: KeyBind.get('!menu', 'pcap-file:open'),
         click: () => { return PubSub.emit('pcap-file:open'); }
+      }));
+      menu.append(new MenuItem({
+        label: 'Export Pcap File...',
+        accelerator: KeyBind.get('!menu', 'pcap-file:save'),
+        click: () => { return PubSub.emit('pcap-file:save'); }
       }));
       return menu;
     };
@@ -119,6 +126,47 @@ export default class PcapFile {
       if (filePath != null) {
         this._open(filePath[0])
       }
+    });
+
+    PubSub.on(this, 'pcap-file:save', () => {
+      if (selectedSession) {
+        let filePath = dialog.showSaveDialog(remote.getCurrentWindow(), {filters: [{name: 'PCAP File', extensions: ['pcap']}]});
+        if (filePath != null) {
+          let stream = fs.createWriteStream(filePath);
+          let packets = [];
+          for (let i = 1;;++i) {
+            let pkt = selectedSession.get(i);
+            if (!pkt.seq) break;
+            packets.push(pkt);
+          }
+
+          let header = Buffer.alloc(24);
+          header.writeUInt32BE(0x4d3cb2a1, 0);                // magicNumber
+          header.writeUInt16LE(2, 4);                         // versionMajor
+          header.writeUInt16LE(4, 6);                         // versionMinor
+          header.writeInt16LE(0, 8);                          // thiszone
+          header.writeUInt32LE(0, 12);                        // sigfigs
+          header.writeUInt32LE(selectedSession.snaplen, 16);  // snaplen
+          header.writeUInt32LE(1, 20);                        // network
+          stream.write(header);
+
+          for (let pkt of packets) {
+            let pktHeader = Buffer.alloc(16);
+            pktHeader.writeUInt32LE(pkt.ts_sec, 0);
+            pktHeader.writeUInt32LE(pkt.ts_nsec, 4);
+            pktHeader.writeUInt32LE(pkt.payload.length, 8);
+            pktHeader.writeUInt32LE(pkt.length, 12);
+            stream.write(pktHeader);
+            stream.write(pkt.payload);
+          }
+
+          stream.end();
+        }
+      }
+    });
+
+    PubSub.on(this, 'core:session-selected', (sess) => {
+      selectedSession = sess.session;
     });
   }
 
