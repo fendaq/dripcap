@@ -30,6 +30,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   v8pp::class_<Buffer> Buffer_class(isolate);
   Buffer_class.ctor<const v8::FunctionCallbackInfo<v8::Value> &>();
   Buffer_class.set("from", &Buffer::from);
+  Buffer_class.set("concat", &Buffer::concat);
   Buffer_class.set("isBuffer", &Buffer::isBuffer);
   Buffer_class.set("length", v8pp::property(&Buffer::length));
   Buffer_class.set("slice", &Buffer::sliceBuffer);

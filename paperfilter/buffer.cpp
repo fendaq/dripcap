@@ -315,6 +315,32 @@ void Buffer::from(const v8::FunctionCallbackInfo<v8::Value> &args) {
   args.GetReturnValue().Set(obj);
 }
 
+void Buffer::concat(const v8::FunctionCallbackInfo<v8::Value> &args) {
+  Isolate *isolate = Isolate::GetCurrent();
+  if (args[0]->IsArray()) {
+    v8::Local<v8::Array> list = args[0].As<v8::Array>();
+    std::vector<Buffer *> buffers;
+    for (size_t i = 0; i < list->Length(); ++i) {
+      if (Buffer *buffer =
+              v8pp::class_<Buffer>::unwrap_object(isolate, list->Get(i))) {
+        buffers.push_back(buffer);
+      }
+    }
+    size_t length = 0;
+    for (const Buffer *buf : buffers) {
+      length += buf->length();
+    }
+    auto data = std::make_shared<std::vector<char>>();
+    data->reserve(length);
+    for (const Buffer *buf : buffers) {
+      data->insert(data->end(), buf->data(), buf->data() + buf->length());
+    }
+    Local<Object> obj =
+        v8pp::class_<Buffer>::create_object(Isolate::GetCurrent(), data);
+    args.GetReturnValue().Set(obj);
+  }
+}
+
 bool Buffer::isBuffer(const v8::Local<v8::Value> &value) {
   return v8pp::class_<Buffer>::unwrap_object(Isolate::GetCurrent(), value);
 }
