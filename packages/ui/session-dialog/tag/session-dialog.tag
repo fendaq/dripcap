@@ -47,7 +47,12 @@
         PubSub.emit('core:session-added', sess);
         sess.start();
         sess.on('log', log => {
-          console.log(log)
+          PubSub.pub('core:log', {
+            level: log.level,
+            message: log.message,
+            timestamp: new Date(),
+            data: log.data
+          });
         });
       });
 
