@@ -76,10 +76,12 @@ export default class Dissector {
   *decode() {
     let payload = new Buffer([]);
     let http = {};
+    let headerEnd = -1;
+    let contentLength = -1;
     while (true) {
       let chunk = yield(true);
       payload = Buffer.concat([payload, chunk]);
-      let headerEnd = payload.indexOf(Buffer.from('\r\n\r\n', 'utf8'));
+      headerEnd = payload.indexOf(Buffer.from('\r\n\r\n', 'utf8'));
       if (headerEnd > 0) {
         let header = payload.slice(0, headerEnd + 4).toString('utf8');
         let re = /(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH) (\S+) (HTTP\/(0\.9|1\.0|1\.1))\r\n/;
@@ -90,6 +92,10 @@ export default class Dissector {
           http.version = m[3];
           http.payload = payload;
           http.headers = [];
+
+          if (http.method === 'HEAD') {
+            contentLength = 0;
+          }
 
           let cursor = m[0].length;
           header = header.substr(cursor);
@@ -104,12 +110,26 @@ export default class Dissector {
             });
             cursor += m[0].length;
             header = header.substr(m[0].length);
+            if (m[1].toLowerCase() === 'content-length') {
+              contentLength = parseInt(m[2]);
+            }
           }
-
           break;
         } else {
           yield false;
         }
+      }
+    }
+
+    if (contentLength > 0) {
+      let totalLength = headerEnd + 4 + contentLength;
+      while (true) {
+        if (http.payload.length >= totalLength) {
+          http.payload = http.payload.slice(0, totalLength);
+          break;
+        }
+        let chunk = yield(true);
+        http.payload = Buffer.concat([http.payload, chunk]);
       }
     }
 
