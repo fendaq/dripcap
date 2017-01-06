@@ -1,6 +1,7 @@
 import path from 'path';
 import $ from 'jquery';
 import { webFrame } from 'electron';
+import devtron from 'devtron';
 import Env from './env';
 import Profile from './profile';
 import Theme from './theme';
@@ -14,6 +15,8 @@ import Logger from './logger';
 import init from './init';
 
 export default function(argv, profileName = 'default') {
+  devtron.install();
+
   Object.defineProperty(document, 'createElementNS', {
     value: document.createElementNS
   });

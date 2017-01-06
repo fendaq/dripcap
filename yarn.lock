@@ -4,6 +4,10 @@ abbrev@~1.0.9, abbrev@1:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
 
+accessibility-developer-tools@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/accessibility-developer-tools/-/accessibility-developer-tools-2.11.0.tgz#2b669c802671672aed5c61c42a782082a2fc7d2c"
+
 acorn@^4.0.1:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.3.tgz#1a3e850b428e73ba6b09d1cc527f5aaad4d03ef1"
@@ -1003,6 +1007,14 @@ detect-indent@^4.0.0:
 dev-null@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dev-null/-/dev-null-0.1.1.tgz#5a205ce3c2b2ef77b6238d6ba179eb74c6a0e818"
+
+devtron@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/devtron/-/devtron-1.4.0.tgz#b5e748bd6e95bbe70bfcc68aae6fe696119441e1"
+  dependencies:
+    accessibility-developer-tools "^2.11.0"
+    highlight.js "^9.3.0"
+    humanize-plus "^1.8.1"
 
 dezalgo@^1.0.0, dezalgo@^1.0.1, dezalgo@~1.0.3:
   version "1.0.3"
@@ -2092,6 +2104,10 @@ hawk@~3.1.3:
     hoek "2.x.x"
     sntp "1.x.x"
 
+highlight.js@^9.3.0:
+  version "9.9.0"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.9.0.tgz#b9995dcfdc2773e307a34f0460d92b9a474782c0"
+
 hoek@0.9.x:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-0.9.1.tgz#3d322462badf07716ea7eb85baf88079cddce505"
@@ -2134,6 +2150,10 @@ http-signature@~1.1.0:
     assert-plus "^0.2.0"
     jsprim "^1.2.2"
     sshpk "^1.7.0"
+
+humanize-plus@^1.8.1:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/humanize-plus/-/humanize-plus-1.8.2.tgz#a65b34459ad6367adbb3707a82a3c9f916167030"
 
 iconv-lite@~0.2.11:
   version "0.2.11"
