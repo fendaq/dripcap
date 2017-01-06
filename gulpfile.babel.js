@@ -194,6 +194,17 @@ gulp.task('win32', cb => {
   });
 });
 
+gulp.task('winstaller', cb => {
+  return require('electron-winstaller').createWindowsInstaller({
+    appDirectory: '.builtapp/Dripcap-win32-x64',
+    outputDirectory: '.winstaller',
+    authors: 'dripcap',
+    noMsi: true,
+    exe: 'Dripcap.exe'
+  });
+});
+
+
 gulp.task('default', ['build'], cb => {
   let env = {
     DRIPCAP_ATTACH: '1'

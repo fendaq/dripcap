@@ -12,13 +12,13 @@ test_script:
 after_test:
 - ps: travis\windows-before-deploy.ps1
 artifacts:
-- path: dripcap-windows-amd64.zip
+- path: dripcap-windows-amd64.exe
 deploy:
   release: $(APPVEYOR_REPO_TAG_NAME)
   provider: GitHub
   auth_token:
     secure: 5xfEThlejgLcJhJS3rNfbbvFPDyuRy+wVgC0/KrbMiWycAYQej7GhAbCVvSneLoT
-  artifact: dripcap-windows-amd64.zip
+  artifact: dripcap-windows-amd64.exe
   draft: false
   prerelease: false
   on:
