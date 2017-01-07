@@ -8,6 +8,10 @@ export default class DNSDissector {
   }
 
   analyze(packet, parentLayer) {
+    if (parentLayer.attrs.srcPort.data !== 53 && parentLayer.attrs.dstPort.data !== 53) {
+      return;
+    }
+
     let layer = {
       items: [],
       attrs: {}
