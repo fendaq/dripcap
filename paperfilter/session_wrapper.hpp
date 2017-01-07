@@ -34,6 +34,7 @@ public:
                      setPromiscuous);
     Nan::SetAccessor(otl, Nan::New("snaplen").ToLocalChecked(), snaplen,
                      setSnaplen);
+    Nan::SetAccessor(otl, Nan::New("status").ToLocalChecked(), status);
     SetPrototypeMethod(tpl, "setBPF", setBPF);
     SetPrototypeMethod(tpl, "start", start);
     SetPrototypeMethod(tpl, "stop", stop);
@@ -219,6 +220,13 @@ public:
     if (!wrapper->session->setBPF(bpf, &err)) {
       Nan::ThrowSyntaxError(err.c_str());
     }
+  }
+
+  static NAN_GETTER(status) {
+    SessionWrapper *wrapper = ObjectWrap::Unwrap<SessionWrapper>(info.Holder());
+    if (!wrapper->session)
+      return;
+    info.GetReturnValue().Set(wrapper->session->status());
   }
 
   static NAN_METHOD(start) {

@@ -35,6 +35,7 @@ public:
   Private();
   ~Private();
   void log(const LogMessage &msg);
+  v8::Local<v8::Object> status();
 
 public:
   std::unique_ptr<PacketStore> store;
@@ -117,38 +118,47 @@ Session::Private::Private() {
       d->prevQueue = queue;
 
       Isolate *isolate = Isolate::GetCurrent();
-      Local<Object> obj = Object::New(isolate);
-      v8pp::set_option(isolate, obj, "capturing", d->capturing);
-      v8pp::set_option(isolate, obj, "packets", packets);
-      v8pp::set_option(isolate, obj, "queue", queue);
-      Local<Object> filtered = Object::New(isolate);
-
-      for (auto &pair : d->filterThreads) {
-        FilterContext &context = pair.second;
-        if (context.initialMaxSeq > 0 &&
-            context.ctx->packets.maxSeq() >= context.initialMaxSeq) {
-          int ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                       std::chrono::system_clock::now() - context.startTime)
-                       .count();
-          LogMessage msg;
-          msg.level = LogMessage::LEVEL_DEBUG;
-          msg.message = "Filter [" + pair.first + "]: " +
-                        std::to_string(context.initialMaxSeq) + "packets / " +
-                        std::to_string(ms / 1000.0) + "sec";
-          msg.domain = "filter";
-          d->log(msg);
-          context.initialMaxSeq = 0;
-        }
-        v8pp::set_option(isolate, filtered, pair.first.c_str(),
-                         context.ctx->packets.size());
-      }
-
-      v8pp::set_option(isolate, obj, "filtered", filtered);
-      Handle<Value> args[1] = {obj};
+      Handle<Value> args[1] = {d->status()};
       Local<Function> func = Local<Function>::New(isolate, d->statusCb);
       func->Call(isolate->GetCurrentContext()->Global(), 1, args);
     }
   });
+}
+
+v8::Local<v8::Object> Session::Private::status() {
+  uint32_t packets = store->maxSeq();
+  uint32_t queue =
+      packetDispatcher->queueSize() + streamDispatcher->queueSize();
+
+  Isolate *isolate = Isolate::GetCurrent();
+  Local<Object> obj = Object::New(isolate);
+  v8pp::set_option(isolate, obj, "capturing", capturing);
+  v8pp::set_option(isolate, obj, "packets", packets);
+  v8pp::set_option(isolate, obj, "queue", queue);
+  Local<Object> filtered = Object::New(isolate);
+
+  for (auto &pair : filterThreads) {
+    FilterContext &context = pair.second;
+    if (context.initialMaxSeq > 0 &&
+        context.ctx->packets.maxSeq() >= context.initialMaxSeq) {
+      int ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::system_clock::now() - context.startTime)
+                   .count();
+      LogMessage msg;
+      msg.level = LogMessage::LEVEL_DEBUG;
+      msg.message = "Filter [" + pair.first + "]: " +
+                    std::to_string(context.initialMaxSeq) + "packets / " +
+                    std::to_string(ms / 1000.0) + "sec";
+      msg.domain = "filter";
+      log(msg);
+      context.initialMaxSeq = 0;
+    }
+    v8pp::set_option(isolate, filtered, pair.first.c_str(),
+                     context.ctx->packets.size());
+  }
+
+  v8pp::set_option(isolate, obj, "filtered", filtered);
+  return obj;
 }
 
 void Session::Private::log(const LogMessage &msg) {
@@ -278,6 +288,8 @@ int Session::snaplen() const { return d->pcap->snaplen(); }
 bool Session::setBPF(const std::string &filter, std::string *error) {
   return d->pcap->setBPF(filter, error);
 }
+
+v8::Local<v8::Object> Session::status() const { return d->status(); }
 
 void Session::start() {
   d->pcap->start();

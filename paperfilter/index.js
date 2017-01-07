@@ -190,6 +190,10 @@ class Session extends EventEmitter {
     this._sess.setBPF(bpf);
   }
 
+  get status() {
+    return this._sess.status;
+  }
+
   start() {
     if (process.env['DRIPCAP_UI_TEST'] != null) {
       let readStream = require('fs').createReadStream(process.env['DRIPCAP_UI_TEST'] + '/dump.msgpack');

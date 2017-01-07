@@ -38,6 +38,7 @@ public:
   void setSnaplen(int len);
   int snaplen() const;
   bool setBPF(const std::string &filter, std::string *error);
+  v8::Local<v8::Object> status() const;
 
   void start();
   void stop();
