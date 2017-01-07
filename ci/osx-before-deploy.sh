@@ -24,4 +24,4 @@ ditto -c -k --sequesterRsrc --keepParent ./Dripcap-darwin-x64/dripcap.app ../dri
 
 cd ..
 yarn global add appdmg
-appdmg travis/appdmg.json dripcap-darwin-amd64.dmg
+appdmg ci/appdmg.json dripcap-darwin-amd64.dmg

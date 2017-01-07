@@ -18,9 +18,9 @@ addons:
     - chrpath
     - rpm
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source travis/linux-before-install.sh
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source ci/linux-before-install.sh
   ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source travis/osx-before-install.sh ;
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ci/osx-before-install.sh ;
   fi
 install:
 - yarn global add gulp babel-cli node-gyp
@@ -28,7 +28,7 @@ install:
 - yarn
 - gulp build
 before_script:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source travis/linux-before-script.sh
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source ci/linux-before-script.sh
   ; fi
 script:
 - npm test
@@ -37,9 +37,9 @@ notifications:
   slack:
     secure: Dr/J/sDCBmN2iu6fHJjKcypeR+TYojw9oGLRvoxiOaGsrbD5idpePYVEnrMVcuA/3NfzZiLVDue7T5NmufbhVpNacxVv1IwxC1f+T3C/gy2JgqIrynGEzmKGyQTNP+fEzPYRlXPdFWtl5WpZOHsLCQMZDe290Y/8yRG3VKasNxPl2iwUxU0yDnvp11tOnPjvkW5/GYa3qojSLK+oBywq/JJ7DriKnMW18k5deuN8rqVsC5iMwSJXvUuBr3RUwjTVyi3MLwoUW2xlIaMQTHJkgSLeZEuFeumJZeKUlYjLlnT4V0idZG00IC3r28P3l/IA1F4o8heWHN4wBN1lbj4pGQpheC25D9DnibgmZtqED2UNjFa7W5Xfg0/mkRC+0PQYvc7psvBgnIbFmAL9NU2iDabXj9o5rEMzE3XFDQjtkDdrFqAREQAgXh3jgCPeutEZXsXZiRDRIL+4q9e3mSx7akyPLHZhETGB6Gd2s6DMk+TAw3bK40TRzP8D7L057byDwZ+kfUswsghEpDkdK+my0PjIl3rRoLyKaGoH5qqCC3eTbLxZh+CLzXJ0uI4iKzHu+lawZ1NUBOQOQwPqveP40Ze9W3RoTQIuyoJJMGwLCx0ie4L7Z5MOfE6+3m+jDg6INCUkhEKk6Z8hqsn+Fe+X6Hcc+JOG1iphp/XSHQUGx6M=
 before_deploy:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source travis/linux-before-deploy.sh
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then source ci/linux-before-deploy.sh
   ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source travis/osx-before-deploy.sh ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source ci/osx-before-deploy.sh ; fi
 deploy:
 - provider: releases
   api_key:
