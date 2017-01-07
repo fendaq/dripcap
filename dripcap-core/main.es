@@ -1,13 +1,11 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, shell } from 'electron';
 import minimist from 'minimist';
 import paperfilter from 'paperfilter';
 
 if (require('electron-squirrel-startup')) app.quit();
 
-if (!paperfilter.Session.permission) {
-  if (process.platform === 'darwin') {
-    require('dripcap-helper')();
-  }
+if (!paperfilter.Session.permission && process.platform === 'darwin') {
+  require('dripcap-helper')();
 }
 
 app.commandLine.appendSwitch('js-flags', '--harmony-async-await --no-memory-reducer');
@@ -20,6 +18,20 @@ app.on('quit', () => {
 app.on('window-all-closed', () => app.quit());
 
 app.on('ready', () => {
+  if (process.platform === 'win32' && process.env['DRIPCAP_UI_TEST'] == null) {
+    if (!paperfilter.Session.permission) {
+      let button = dialog.showMessageBox({
+        title: "WinPcap required",
+        message: "Dripcap depends on WinPcap.\nPlease install WinPcap on your system.",
+        buttons: ["Download WinPcap", "Quit"]
+      });
+      if (button === 0) {
+        shell.openExternal('https://www.winpcap.org/install/');
+      }
+      app.quit();
+    }
+  }
+
   let options = {
     width: 1200,
     height: 600,
