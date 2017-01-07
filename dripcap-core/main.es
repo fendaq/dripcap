@@ -1,7 +1,14 @@
 import { app, BrowserWindow } from 'electron';
 import minimist from 'minimist';
+import paperfilter from 'paperfilter';
 
 if (require('electron-squirrel-startup')) app.quit();
+
+if (!paperfilter.Session.permission) {
+  if (process.platform === 'darwin') {
+    require('dripcap-helper')();
+  }
+}
 
 app.commandLine.appendSwitch('js-flags', '--harmony-async-await --no-memory-reducer');
 app.commandLine.appendSwitch('--enable-experimental-web-platform-features');
