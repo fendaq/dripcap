@@ -6,7 +6,6 @@ os:
 osx_image: xcode8
 cache:
   directories:
-  - node_modules
   - $HOME/.yarn-cache
 addons:
   apt:
