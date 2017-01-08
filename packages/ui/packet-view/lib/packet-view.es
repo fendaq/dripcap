@@ -7,6 +7,7 @@ import { Menu, Package, PubSub, Session, Layout } from 'dripcap';
 
 export default class PacketView {
   async activate() {
+    Layout.require(__dirname + '/../tag/packet-view-item.tag');
     Layout.require(__dirname + '/../tag/packet-view-layer.tag');
     Layout.require(__dirname + '/../tag/packet-view.tag');
     let layout = {
