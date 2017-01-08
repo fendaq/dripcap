@@ -14,11 +14,12 @@ export default class DNSDissector {
 
     let layer = {
       items: [],
-      attrs: {}
+      attrs: {},
+      namespace: parentLayer.namespace + '::DNS',
+      name: 'DNS',
+      id: 'dns',
+      confidence: 0.8
     };
-    layer.namespace = parentLayer.namespace + '::DNS';
-    layer.name = 'DNS';
-    layer.id = 'dns';
 
     let id = parentLayer.payload.readUInt16BE(0);
     let flags0 = parentLayer.payload.readUInt8(2);

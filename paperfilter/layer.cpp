@@ -14,6 +14,7 @@ public:
   std::string id;
   std::string summary;
   std::string range;
+  double confidence = 1.0;
   std::unordered_map<std::string, std::shared_ptr<Layer>> layers;
   std::weak_ptr<Packet> pkt;
   std::vector<std::shared_ptr<Item>> items;
@@ -33,6 +34,7 @@ Layer::Layer(v8::Local<v8::Object> options) : d(std::make_shared<Private>()) {
   v8pp::get_option(isolate, options, "id", d->id);
   v8pp::get_option(isolate, options, "summary", d->summary);
   v8pp::get_option(isolate, options, "range", d->range);
+  v8pp::get_option(isolate, options, "confidence", d->confidence);
 
   v8::Local<v8::Array> items;
   if (v8pp::get_option(isolate, options, "items", items)) {
@@ -90,6 +92,10 @@ void Layer::setSummary(const std::string &summary) { d->summary = summary; }
 std::string Layer::range() const { return d->range; };
 
 void Layer::setRange(const std::string &range) { d->range = range; }
+
+double Layer::confidence() const { return d->confidence; }
+
+void Layer::setConfidence(double confidence) { d->confidence = confidence; }
 
 void Layer::addLayer(const std::shared_ptr<Layer> &layer) {
   d->layers[layer->ns()] = std::move(layer);

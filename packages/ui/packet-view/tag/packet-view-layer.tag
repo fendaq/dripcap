@@ -1,6 +1,7 @@
 <packet-view-layer>
   <p class="layer-name list-item" oncontextmenu={ layerContext } onclick={ toggleLayer } onmouseover={ layerRange } onmouseout={ rangeOut }>
     <i class={ fa: true, 'fa-arrow-circle-right': !visible, 'fa-arrow-circle-down': visible }></i>
+    <i class="fa fa-question-circle" if={ layer.confidence < 1.0 }></i>
     { layer.name }
     <i class="text-summary">{ layer.summary }</i>
   </p>

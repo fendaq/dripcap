@@ -62,6 +62,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Layer_class.set("id", v8pp::property(&Layer::id));
   Layer_class.set("summary", v8pp::property(&Layer::summary));
   Layer_class.set("range", v8pp::property(&Layer::range));
+  Layer_class.set("confidence", v8pp::property(&Layer::confidence));
   Layer_class.set("payload", v8pp::property(&Layer::payloadBuffer));
   Layer_class.set("layers", v8pp::property(&Layer::layersObject));
   Layer_class.class_function_template()->PrototypeTemplate()->SetAccessor(

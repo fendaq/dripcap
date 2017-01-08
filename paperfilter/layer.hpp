@@ -30,6 +30,8 @@ public:
   void setSummary(const std::string &summary);
   std::string range() const;
   void setRange(const std::string &ns);
+  double confidence() const;
+  void setConfidence(double confidence);
 
   void addLayer(const std::shared_ptr<Layer> &layer);
   std::unordered_map<std::string, std::shared_ptr<Layer>> &layers() const;
