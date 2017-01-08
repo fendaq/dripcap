@@ -20,7 +20,6 @@ cd .builtapp
 
 codesign --deep --force --verify --verbose --sign "$DRIPCAP_DARWIN_SIGN" ./Dripcap-darwin-x64/dripcap.app/Contents/Frameworks/*
 codesign --deep --force --verify --verbose --sign "$DRIPCAP_DARWIN_SIGN" "./Dripcap-darwin-x64/dripcap.app"
-ditto -c -k --sequesterRsrc --keepParent ./Dripcap-darwin-x64/dripcap.app ../dripcap-darwin-amd64.zip
 
 cd ..
 yarn global add appdmg
