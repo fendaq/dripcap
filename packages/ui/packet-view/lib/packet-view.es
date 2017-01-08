@@ -76,48 +76,35 @@ export default class PacketView {
     };
 
     this.layerMenu = function(menu, e) {
-      let find = function(layer, ns) {
+      let find = function(layer, id) {
         if (layer.layers != null) {
-          for (var k in layer.layers) {
-            var v = layer.layers[k];
-            if (k === ns) {
-              return v;
-            }
+          for (let k in layer.layers) {
+            let v = layer.layers[k];
+            if (v.id === id) return v;
           }
-          for (k in layer.layers) {
-            var v = layer.layers[k];
-            let r = find(v, ns);
-            if (r != null) {
-              return r;
-            }
+          for (let k in layer.layers) {
+            let v = layer.layers[k];
+            let r = find(v, id);
+            if (r != null) return r;
           }
-        }
-      };
-
-      let exportRawData = () => {
-        let layer = find(this.packet, this.clickedLayerNamespace);
-        let filename = `${this.packet.interface}-${layer.name}-${this.packet.timestamp.toISOString()}.bin`;
-        let path = dialog.showSaveDialog(remote.getCurrentWindow(), {
-          defaultPath: filename
-        });
-        if (path != null) {
-          fs.writeFileSync(path, layer.payload.apply(this.packet.payload));
         }
       };
 
       let exportPayload = () => {
-        let layer = find(this.packet, this.clickedLayerNamespace);
-        let filename = `${this.packet.interface}-${layer.name}-${this.packet.timestamp.toISOString()}.bin`;
+        let packet = this.opts.packet;
+        let layer = find(packet, this.clickedLayerId);
+        let filename = `${layer.name}.bin`;
         let path = dialog.showSaveDialog(remote.getCurrentWindow(), {
           defaultPath: filename
         });
         if (path != null) {
-          fs.writeFileSync(path, layer.payload.apply(this.packet.payload));
+          fs.writeFileSync(path, layer.payload);
         }
       };
 
       let copyAsJSON = () => {
-        let layer = find(this.packet, this.clickedLayerNamespace);
+        let packet = this.opts.packet;
+        let layer = find(packet, this.clickedLayerId);
         let json = JSON.stringify(layer, null, ' ');
         clipboard.writeText(json);
         return notifier.notify({
@@ -126,10 +113,6 @@ export default class PacketView {
         });
       };
 
-      menu.append(new MenuItem({
-        label: 'Export raw data',
-        click: exportRawData
-      }));
       menu.append(new MenuItem({
         label: 'Export payload',
         click: exportPayload

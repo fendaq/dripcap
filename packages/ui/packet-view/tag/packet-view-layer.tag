@@ -12,7 +12,7 @@
       { layer.error }
     </li>
   </ul>
-  <packet-view-layer each={ layer, ns in rootLayers } layer={ layer } range={ parent.range }></packet-view-layer>
+  <packet-view-layer each={ layer, ns in rootLayers } layer={ layer } range={ parent.range } packet={ parent.opts.packet }></packet-view-layer>
 
   <script>
     const { Menu, PubSub } = require('dripcap');
@@ -33,7 +33,7 @@
     }
 
     layerContext(e) {
-      this.clickedLayerNamespace = e.item.ns;
+      this.clickedLayerId = this.layer.id;
       e.filterText = this.layer.id;
       Menu.popup('packet-view:layer-menu', this, remote.getCurrentWindow(), {event: e});
       e.stopPropagation();

@@ -18,7 +18,7 @@
       <i class="fa fa-exclamation-circle text-warn"> This packet has been truncated.</i>
     </li>
   </ul>
-  <packet-view-layer if={ packet } each={ layer, ns in rootLayers }></packet-view-layer>
+  <packet-view-layer if={ packet } each={ layer, ns in rootLayers } packet={ parent.packet }></packet-view-layer>
 </div>
 
 <script>
