@@ -7,6 +7,8 @@ import { Menu, Package, PubSub, Session, Layout } from 'dripcap';
 
 export default class PacketView {
   async activate() {
+    Layout.require(__dirname + '/../tag/packet-view-item.tag');
+    Layout.require(__dirname + '/../tag/packet-view-layer.tag');
     Layout.require(__dirname + '/../tag/packet-view.tag');
     let layout = {
       center: {
@@ -159,7 +161,7 @@ export default class PacketView {
     Menu.unregister('packet-view:numeric-value-menu', this.copyMenu);
     Menu.unregister('packet-view:context-menu', this.filterMenu);
     Menu.unregister('packet-view:context-menu', this.copyMenu);
-    
+
     Layout.container('drip-tab-top').remove('packet-view');
     Layout.unregister('packet-view');
     PubSub.removeHolder(this);

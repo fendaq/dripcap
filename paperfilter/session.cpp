@@ -189,7 +189,7 @@ Session::~Session() {
 
 void Session::analyze(std::unique_ptr<Packet> pkt) {
   const auto &layer = std::make_shared<Layer>(d->ns);
-  layer->setName("Raw Layer");
+  layer->setName("Frame");
   layer->setPayload(pkt->payload());
   pkt->addLayer(layer);
   d->packetDispatcher->analyze(std::move(pkt));
@@ -198,7 +198,7 @@ void Session::analyze(std::unique_ptr<Packet> pkt) {
 void Session::analyze(std::vector<std::unique_ptr<Packet>> packets) {
   for (auto &pkt : packets) {
     const auto &layer = std::make_shared<Layer>(d->ns);
-    layer->setName("Raw Layer");
+    layer->setName("Frame");
     layer->setPayload(pkt->payload());
     pkt->addLayer(layer);
   }
