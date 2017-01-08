@@ -199,6 +199,9 @@ gulp.task('winstaller', cb => {
     appDirectory: '.builtapp/Dripcap-win32-x64',
     outputDirectory: '.winstaller',
     authors: 'dripcap',
+    iconUrl: 'https://raw.githubusercontent.com/dripcap/dripcap/master/images/dripcap.ico',
+    setupIcon: 'images/dripcap-drive.ico',
+    loadingGif: 'images/dripcap-install.gif',
     noMsi: true,
     exe: 'Dripcap.exe'
   });
