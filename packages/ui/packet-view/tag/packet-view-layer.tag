@@ -12,12 +12,12 @@
       { layer.error }
     </li>
   </ul>
-  <packet-view-layer each={ layer, ns in rootLayers } layer={ layer } range={ parent.range } packet={ parent.opts.packet }></packet-view-layer>
+  <packet-view-layer each={ layer, index in rootLayers } layer={ layer } range={ parent.range } packet={ parent.opts.packet }></packet-view-layer>
 
   <script>
     const { Menu, PubSub } = require('dripcap');
     const { remote } = require('electron');
-    this.visible = true;
+    this.visible = (this.index === 0);
 
     this.on('before-mount', () => {
       this.reset();
@@ -29,7 +29,11 @@
 
     reset() {
       this.range = (opts.range != null) ? (opts.range + ' ' + this.layer.range) : this.layer.range;
-      this.rootLayers = this.layer.layers;
+      this.rootLayers = [];
+      for (let id in this.layer.layers) {
+        this.rootLayers.push(this.layer.layers[id]);
+      }
+      this.rootLayers.sort((a, b) => b.confidence - a.confidence);
     }
 
     layerContext(e) {
