@@ -15,7 +15,12 @@ std::shared_ptr<Layer> leafLayer(
     const std::unordered_map<std::string, std::shared_ptr<Layer>> &layers) {
   if (layers.empty())
     return std::shared_ptr<Layer>();
-  const std::shared_ptr<Layer> &layer = layers.begin()->second;
+  std::shared_ptr<Layer> layer;
+  for (const auto &pair : layers) {
+    if (!layer || pair.second->confidence() > layer->confidence()) {
+      layer = pair.second;
+    }
+  }
   const std::shared_ptr<Layer> &child = leafLayer(layer->layers());
   if (child) {
     return child;
