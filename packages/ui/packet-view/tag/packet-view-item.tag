@@ -97,7 +97,7 @@
     <packet-view-custom-value if={ type=='custom' } tag={ tag } val={ val }></packet-view-custom-value>
   </p>
   <ul show={ field.items.length && show }>
-    <packet-view-item each={ field in field.items } layer={ parent.layer } parentObject={ parent.field } parentVal={ parent.val } path={ parent.path }></packet-view-item>
+    <packet-view-item each={ field in field.items } if={ field.name } layer={ parent.layer } parentObject={ parent.field } parentVal={ parent.val } path={ parent.path }></packet-view-item>
   </ul>
 </li>
 

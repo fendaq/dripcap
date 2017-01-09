@@ -6,7 +6,7 @@
     <i class="text-summary">{ layer.summary }</i>
   </p>
   <ul if={ visible }>
-    <packet-view-item each={ field in layer.items } layer={ parent.layer } parentObject={ parent.layer } path={ parent.layer.id }></packet-view-item>
+    <packet-view-item each={ field in layer.items } if={ field.name } layer={ parent.layer } parentObject={ parent.layer } path={ parent.layer.id }></packet-view-item>
     <li if={ layer.error }>
       <a class="text-label">Error:</a>
       { layer.error }
