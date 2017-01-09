@@ -13,7 +13,7 @@ export default function init(dripcap) {
   PubSub.on('core:window-zoom', () => remote.getCurrentWindow().maximize());
   PubSub.on('core:open-user-directroy', () => shell.showItemInFolder(Env.profilePath));
   PubSub.on('core:open-website', () => shell.openExternal('https://dripcap.org'));
-  PubSub.on('core:open-wiki', () => shell.openExternal('https://github.com/dripcap/dripcap/wiki'));
+  PubSub.on('core:open-docs', () => shell.openExternal('https://docs.dripcap.org'));
   PubSub.on('core:show-license', () => shell.openExternal('https://github.com/dripcap/dripcap/blob/master/LICENSE'));
   PubSub.on('core:quit', () => remote.app.quit());
 

@@ -189,15 +189,15 @@ export default class MainMenu {
 
     this.helpMenu = function(menu, e) {
       menu.append(new MenuItem({
-        label: 'Visit Website',
+        label: 'Website',
         click: action('core:open-website')
       }));
       menu.append(new MenuItem({
-        label: 'Visit Wiki',
-        click: action('core:open-wiki')
+        label: 'Documentation',
+        click: action('core:open-docs')
       }));
       menu.append(new MenuItem({
-        label: 'Show License',
+        label: 'License',
         click: action('core:show-license')
       }));
       if (process.platform !== 'darwin') {
