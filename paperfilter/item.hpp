@@ -28,6 +28,7 @@ public:
 
   std::vector<std::shared_ptr<Item>> items() const;
   void addItem(v8::Local<v8::Object> obj);
+  std::shared_ptr<Item> item(const std::string &id) const;
 
 private:
   class Private;

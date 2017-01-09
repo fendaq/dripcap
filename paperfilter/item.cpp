@@ -13,6 +13,7 @@ public:
   std::string range;
   ItemValue value;
   std::vector<std::shared_ptr<Item>> items;
+  std::map<std::string, size_t> keys;
 };
 
 Item::Item() : d(new Private()) {}
@@ -87,5 +88,16 @@ void Item::addItem(v8::Local<v8::Object> obj) {
     d->items.emplace_back(std::make_shared<Item>(*item));
   } else if (obj->IsObject()) {
     d->items.emplace_back(std::make_shared<Item>(obj));
+  } else {
+    return;
   }
+  d->keys[d->items.back()->id()] = d->items.size() - 1;
+}
+
+std::shared_ptr<Item> Item::item(const std::string &id) const {
+  auto it = d->keys.find(id);
+  if (it != d->keys.end()) {
+    return d->items[it->second];
+  }
+  return std::shared_ptr<Item>();
 }
