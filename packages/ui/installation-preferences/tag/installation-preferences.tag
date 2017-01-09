@@ -1,13 +1,13 @@
 <installation-preferences-item>
   <li class="packages border">
-    <p class="head">{ opts.pkg.name } ({ opts.pkg.version })<i class="text-label">{ opts.pkg.description }</i>
+    <p class="head">{ pkg.name } ({ pkg.version })<i class="text-label">{ pkg.description }</i>
     </p>
     <ul class="items">
       <li>
-        <input type="button" disabled={ parent.installing } show={ opts.pkg.status === 'none' }      value="Install v{opts.pkg.version}" onclick={ parent.installPackage }>
-        <input type="button" disabled={ parent.installing } show={ opts.pkg.status === 'old' }       value="Update to v{opts.pkg.version}" onclick={ parent.installPackage }>
-        <input type="button" show={ opts.pkg.status === 'installed' } value="Up to date" disabled>
-        <input type="button" disabled={ parent.installing } show={ opts.pkg.userPackage && opts.pkg.status !== 'none' } value="Uninstall" onclick={ parent.uninstallPackage }>
+        <input type="button" disabled={ parent.installing } show={ pkg.status === 'none' }      value="Install v{pkg.version}" onclick={ parent.installPackage }>
+        <input type="button" disabled={ parent.installing } show={ pkg.status === 'old' }       value="Update to v{pkg.version}" onclick={ parent.installPackage }>
+        <input type="button" show={ pkg.status === 'installed' } value="Up to date" disabled>
+        <input type="button" disabled={ parent.installing } show={ pkg.userPackage && pkg.status !== 'none' } value="Uninstall" onclick={ parent.uninstallPackage }>
         </li>
       </li>
     </ul>
@@ -31,7 +31,7 @@
   </ul>
 
   <ul>
-    <installation-preferences-item each={ pkg in packages } pkg={ pkg }></installation-preferences-item>
+    <installation-preferences-item each={ pkg in packages }></installation-preferences-item>
   </ul>
 
   <style type="text/less">
