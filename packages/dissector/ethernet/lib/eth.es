@@ -75,7 +75,8 @@ export default class Dissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '14:'
+      range: '14:',
+      value: layer.payload
     });
 
     return new Layer(layer);

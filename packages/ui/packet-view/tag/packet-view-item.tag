@@ -165,15 +165,14 @@
 
     let id = this.field.id;
     if (id) {
+      this.path = opts.path + '.' + id;
       if (id in opts.layer.attrs) {
         this.path = opts.layer.id + '.' + id;
         this.val = opts.layer.attrs[id].data;
         valType = opts.layer.attrs[id].type;
       } else if (typeof opts.parentval === 'object' && id in opts.parentval) {
-        this.path = opts.path + '.' + id;
         this.val = opts.parentval[id];
       } else if (opts.parentobject.hasOwnProperty(id)) {
-        this.path = opts.path + '.' + id;
         this.val = opts.parentobject[id];
       }
     }
