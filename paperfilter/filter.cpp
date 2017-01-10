@@ -68,6 +68,8 @@ FilterFunc makeFilter(const json11::Json &json) {
         }
       }
 
+      value = fetchValue(value);
+
       if (result.IsEmpty()) {
         if (value->IsString()) {
           value = v8::StringObject::New(value.As<v8::String>());
