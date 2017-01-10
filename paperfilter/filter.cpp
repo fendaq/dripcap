@@ -1,6 +1,7 @@
 #include "filter.hpp"
 #include "layer.hpp"
 #include "packet.hpp"
+#include "item.hpp"
 #include "item_value.hpp"
 #include <json11.hpp>
 #include <nan.h>
@@ -47,6 +48,8 @@ FilterFunc makeFilter(const json11::Json &json) {
         const auto it = attrs.find(name);
         if (it != attrs.end()) {
           result = it->second.data();
+        } else if (const std::shared_ptr<Item> &item = layer->item(name)) {
+          result = item->value().data();
         }
       }
 

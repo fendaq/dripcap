@@ -18,6 +18,7 @@ public:
   std::unordered_map<std::string, std::shared_ptr<Layer>> layers;
   std::weak_ptr<Packet> pkt;
   std::vector<std::shared_ptr<Item>> items;
+  std::map<std::string, size_t> keys;
   std::unordered_map<std::string, ItemValue> attrs;
   std::unique_ptr<Buffer> payload;
   std::unique_ptr<LargeBuffer> largePayload;
@@ -126,7 +127,10 @@ void Layer::addItem(v8::Local<v8::Object> obj) {
     d->items.emplace_back(std::make_shared<Item>(*item));
   } else if (obj->IsObject()) {
     d->items.emplace_back(std::make_shared<Item>(obj));
+  } else {
+    return;
   }
+  d->keys[d->items.back()->id()] = d->items.size() - 1;
 }
 
 std::vector<std::shared_ptr<Item>> Layer::items() const { return d->items; }
@@ -136,6 +140,14 @@ std::unique_ptr<Buffer> Layer::payload() const {
     return d->payload->slice();
   }
   return nullptr;
+}
+
+std::shared_ptr<Item> Layer::item(const std::string &id) const {
+  auto it = d->keys.find(id);
+  if (it != d->keys.end()) {
+    return d->items[it->second];
+  }
+  return std::shared_ptr<Item>();
 }
 
 std::unique_ptr<LargeBuffer> Layer::largePayload() const {
