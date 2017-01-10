@@ -1,6 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import MACAddress from 'driptool/mac';
 import {IPv4Address} from 'driptool/ipv4';
 
@@ -11,88 +9,109 @@ export default class ARPDissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet::ARP';
     layer.name = 'ARP';
     layer.id = 'arp';
 
     let htypeNumber = parentLayer.payload.readUInt16BE(0);
-    let htype = Enum(hardwareTable, htypeNumber);
     layer.items.push({
       name: 'Hardware type',
       id: 'htype',
-      range: '0:2'
+      range: '0:2',
+      value: htypeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '0:2',
+          value: hardwareTable[htypeNumber]
+        }
+      ]
     });
-    layer.attrs.htype = htype;
 
     let ptypeNumber = parentLayer.payload.readUInt16BE(2);
-    let ptype = Enum(protocolTable, ptypeNumber);
     layer.items.push({
       name: 'Protocol type',
       id: 'ptype',
-      range: '2:4'
+      range: '2:4',
+      value: ptypeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '2:4',
+          value: protocolTable[ptypeNumber]
+        }
+      ]
     });
-    layer.attrs.ptype = ptype;
 
     let hlen = parentLayer.payload.readUInt8(4);
     layer.items.push({
       name: 'Hardware length',
       id: 'hlen',
-      range: '4:5'
+      range: '4:5',
+      value: hlen
     });
-    layer.attrs.hlen = hlen;
 
     let plen = parentLayer.payload.readUInt8(5);
     layer.items.push({
       name: 'Protocol length',
       id: 'plen',
-      range: '5:6'
+      range: '5:6',
+      value: plen
     });
-    layer.attrs.plen = plen;
 
     let operationNumber = parentLayer.payload.readUInt16BE(6);
-    let operation = Enum(operationTable, operationNumber);
+    let operation = operationNumber;
     let operationName = operationTable[operationNumber];
     layer.items.push({
       name: 'Operation',
       id: 'operation',
-      range: '6:8'
+      range: '6:8',
+      value: operation,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '6:8',
+          value: operationName
+        }
+      ]
     });
-    layer.attrs.operation = operation;
 
     let sha = MACAddress(parentLayer.payload.slice(8, 14));
     layer.items.push({
       name: 'Sender hardware address',
       id: 'sha',
-      range: '8:14'
+      range: '8:14',
+      value: sha
     });
-    layer.attrs.sha = sha;
 
     let spa = IPv4Address(parentLayer.payload.slice(14, 18));
     layer.items.push({
       name: 'Sender protocol address',
       id: 'spa',
-      range: '14:18'
+      range: '14:18',
+      value: spa
     });
-    layer.attrs.spa = spa;
 
     let tha = MACAddress(parentLayer.payload.slice(18, 24));
     layer.items.push({
       name: 'Target hardware address',
       id: 'tha',
-      range: '18:24'
+      range: '18:24',
+      value: tha
     });
-    layer.attrs.tha = tha;
 
     let tpa = IPv4Address(parentLayer.payload.slice(24, 28));
     layer.items.push({
       name: 'Target protocol address',
       id: 'tpa',
-      range: '24:28'
+      range: '24:28',
+      value: tpa
     });
-    layer.attrs.tpa = tpa;
 
     layer.summary = `[${operationName.toUpperCase()}] ${sha.data}-${spa.data} -> ${tha.data}-${tpa.data}`;
 

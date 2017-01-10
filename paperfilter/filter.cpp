@@ -12,10 +12,18 @@
 namespace {
 v8::Local<v8::Value> fetchValue(v8::Local<v8::Value> value) {
   v8::Isolate *isolate = v8::Isolate::GetCurrent();
+  v8::Local<v8::Value> result = value;
   if (const Item *item = v8pp::class_<Item>::unwrap_object(isolate, value)) {
-    return item->value().data();
+    result = item->value().data();
   }
-  return value;
+  if (result->IsObject()) {
+    v8::Local<v8::Object> resultObj = result.As<v8::Object>();
+    v8::Local<v8::String> resultKey = v8pp::to_v8(isolate, "_filter");
+    if (resultObj->Has(resultKey)) {
+      result = resultObj->Get(resultKey);
+    }
+  }
+  return result;
 }
 }
 
@@ -53,12 +61,7 @@ FilterFunc makeFilter(const json11::Json &json) {
 
       if (const Layer *layer =
               v8pp::class_<Layer>::unwrap_object(isolate, value)) {
-        const std::unordered_map<std::string, ItemValue> &attrs =
-            layer->attrs();
-        const auto it = attrs.find(name);
-        if (it != attrs.end()) {
-          result = it->second.data();
-        } else if (const std::shared_ptr<Item> &item = layer->item(name)) {
+        if (const std::shared_ptr<Item> &item = layer->item(name)) {
           result = v8pp::class_<Item>::reference_external(isolate, item.get());
         }
       } else if (const Item *item =
@@ -85,12 +88,6 @@ FilterFunc makeFilter(const json11::Json &json) {
 
       if (result.IsEmpty()) {
         result = v8::Null(isolate);
-      } else if (result->IsObject()) {
-        v8::Local<v8::Object> resultObj = result.As<v8::Object>();
-        v8::Local<v8::String> resultKey = v8pp::to_v8(isolate, "_filter");
-        if (resultObj->Has(resultKey)) {
-          return resultObj->Get(resultKey);
-        }
       }
 
       return result;
@@ -333,5 +330,8 @@ FilterFunc makeFilter(const json11::Json &json) {
 FilterFunc makeFilter(const std::string &jsonstr) {
   std::string err;
   json11::Json json = json11::Json::parse(jsonstr, err);
+  return FilterFunc([json](Packet *pkt) -> v8::Local<v8::Value> {
+    return fetchValue(makeFilter(json)(pkt));
+  });
   return makeFilter(json);
 }

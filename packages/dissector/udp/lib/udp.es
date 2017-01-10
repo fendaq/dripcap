@@ -9,8 +9,7 @@ export default class UDPDissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = parentLayer.namespace.replace('<UDP>', 'UDP');
     layer.name = 'UDP';
@@ -20,43 +19,47 @@ export default class UDPDissector {
     layer.items.push({
       name: 'Source port',
       id: 'srcPort',
-      range: '0:2'
+      range: '0:2',
+      value: source
     });
-    layer.attrs.srcPort = source;
 
     let destination = parentLayer.payload.readUInt16BE(2);
     layer.items.push({
       name: 'Destination port',
       id: 'dstPort',
-      range: '2:4'
+      range: '2:4',
+      value: destination
     });
-    layer.attrs.dstPort = destination;
 
-    let srcAddr = parentLayer.attrs.src;
-    let dstAddr = parentLayer.attrs.dst;
+    let srcAddr = parentLayer.item('src');
+    let dstAddr = parentLayer.item('dst');
+    let src, dst;
+
     if (srcAddr.type === 'dripcap/ipv4/addr') {
-      layer.attrs.src = IPv4Host(srcAddr.data, source);
-      layer.attrs.dst = IPv4Host(dstAddr.data, destination);
+      src = IPv4Host(srcAddr.data, source);
+      dst = IPv4Host(dstAddr.data, destination);
     } else if (srcAddr.type === 'dripcap/ipv6/addr') {
-      layer.attrs.src = IPv6Host(srcAddr.data, source);
-      layer.attrs.dst = IPv6Host(dstAddr.data, destination);
+      src = IPv6Host(srcAddr.data, source);
+      dst = IPv6Host(dstAddr.data, destination);
     }
+    layer.items.push({ id: 'src', value: src });
+    layer.items.push({ id: 'dst', value: dst });
 
     let length = parentLayer.payload.readUInt16BE(4);
     layer.items.push({
       name: 'Length',
       id: 'len',
-      range: '4:6'
+      range: '4:6',
+      value: length
     });
-    layer.attrs.len = length;
 
     let checksum = parentLayer.payload.readUInt16BE(6);
     layer.items.push({
       name: 'Checksum',
       id: 'checksum',
-      range: '6:8'
+      range: '6:8',
+      value: checksum
     });
-    layer.attrs.checksum = checksum;
 
     layer.range = '8:'+ length;
     layer.payload = parentLayer.payload.slice(8, length);
@@ -64,10 +67,11 @@ export default class UDPDissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '8:' + length
+      range: '8:' + length,
+      value: layer.payload
     });
 
-    layer.summary = `${layer.attrs.src.data} -> ${layer.attrs.dst.data}`;
+    layer.summary = `${src.data} -> ${dst.data}`;
     return new Layer(layer);
   }
 }

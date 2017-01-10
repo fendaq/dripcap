@@ -1,6 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 
 export default class DNSDissector {
   static get namespaces() {
@@ -8,13 +6,12 @@ export default class DNSDissector {
   }
 
   analyze(packet, parentLayer) {
-    if (parentLayer.attrs.srcPort.data !== 53 && parentLayer.attrs.dstPort.data !== 53) {
+    if (parentLayer.item('srcPort').data !== 53 && parentLayer.item('dstPort').data !== 53) {
       return;
     }
 
     let layer = {
       items: [],
-      attrs: {},
       namespace: parentLayer.namespace + '::DNS',
       name: 'DNS',
       id: 'dns',
@@ -30,7 +27,6 @@ export default class DNSDissector {
     if (!(opcodeNumber in operationTable)) {
       throw new Error('wrong DNS opcode');
     }
-    let opcode = Enum(operationTable, opcodeNumber);
     let opcodeName = operationTable[opcodeNumber];
 
     let aa = !!((flags0 >> 2) & 1);
@@ -46,7 +42,6 @@ export default class DNSDissector {
     if (!(rcodeNumber in recordTable)) {
       throw new Error('wrong DNS rcode');
     }
-    let rcode = Enum(recordTable, rcodeNumber);
     let rcodeName = recordTable[rcodeNumber];
 
     let qdCount = parentLayer.payload.readUInt16BE(4);
@@ -57,92 +52,109 @@ export default class DNSDissector {
     layer.items.push({
       name: 'ID',
       id: 'id',
-      range: '0:2'
+      range: '0:2',
+      value: id
     });
-    layer.attrs.id = id;
 
     layer.items.push({
       name: 'Query/Response Flag',
       id: 'qr',
-      range: '2:3'
+      range: '2:3',
+      value: qr
     });
-    layer.attrs.qr = qr;
 
     layer.items.push({
       name: 'Operation Code',
       id: 'opcode',
-      range: '2:3'
+      range: '2:3',
+      value: opcodeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '2:3',
+          value: opcodeName
+        }
+      ]
     });
-    layer.attrs.opcode = opcode;
 
     layer.items.push({
       name: 'Authoritative Answer Flag',
       id: 'aa',
-      range: '2:3'
+      range: '2:3',
+      value: aa
     });
-    layer.attrs.aa = aa;
 
     layer.items.push({
       name: 'Truncation Flag',
       id: 'tc',
-      range: '2:3'
+      range: '2:3',
+      value: tc
     });
-    layer.attrs.tc = tc;
 
     layer.items.push({
       name: 'Recursion Desired',
       id: 'rd',
-      range: '2:3'
+      range: '2:3',
+      value: rd
     });
-    layer.attrs.rd = rd;
 
     layer.items.push({
       name: 'Recursion Available',
       id: 'ra',
-      range: '3:4'
+      range: '3:4',
+      value: ra
     });
-    layer.attrs.ra = ra;
 
     layer.items.push({
       name: 'Response Code',
       id: 'rcode',
-      range: '3:4'
+      range: '3:4',
+      value: rcodeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '3:4',
+          value: rcodeName
+        }
+      ]
     });
-    layer.attrs.rcode = rcode;
 
     layer.items.push({
       name: 'Question Count',
       id: 'qdCount',
-      range: '4:6'
+      range: '4:6',
+      value: qdCount
     });
-    layer.attrs.qdCount = qdCount;
 
     layer.items.push({
       name: 'Answer Record Count',
       id: 'anCount',
-      range: '6:8'
+      range: '6:8',
+      value: anCount
     });
-    layer.attrs.anCount = anCount;
 
     layer.items.push({
       name: 'Authority Record Count',
       id: 'nsCount',
-      range: '8:10'
+      range: '8:10',
+      value: nsCount
     });
-    layer.attrs.nsCount = nsCount;
 
     layer.items.push({
       name: 'Additional Record Count',
       id: 'arCount',
-      range: '10:12'
+      range: '10:12',
+      value: arCount
     });
-    layer.attrs.arCount = arCount;
 
     layer.payload = parentLayer.payload.slice(12);
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '12:'
+      range: '12:',
+      value: layer.payload
     });
 
     layer.summary = `[${opcodeName}] [${rcodeName}] qd:${qdCount} an:${anCount} ns:${nsCount} ar:${arCount}`;

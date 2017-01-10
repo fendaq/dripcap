@@ -34,7 +34,7 @@ public:
     Nan::SetAccessor(otl, Nan::New("namespace").ToLocalChecked(), ns);
     Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
     Nan::SetAccessor(otl, Nan::New("timestamp").ToLocalChecked(), timestamp);
-    Nan::SetAccessor(otl, Nan::New("attrs").ToLocalChecked(), attrs);
+    SetPrototypeMethod(tpl, "item", getItem);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
   }
 
@@ -153,21 +153,48 @@ public:
       info.GetReturnValue().Set(pkt->timestamp());
   }
 
-  static NAN_GETTER(attrs) {
+  static NAN_METHOD(getItem) {
     v8::Isolate *isolate = v8::Isolate::GetCurrent();
     SessionPacketWrapper *wrapper =
         ObjectWrap::Unwrap<SessionPacketWrapper>(info.Holder());
+
     if (const std::shared_ptr<const Packet> &pkt = wrapper->pkt.lock()) {
-      v8::Local<v8::Object> obj;
+      const std::string &id = v8pp::from_v8<std::string>(isolate, info[0], "");
 
-      if (wrapper->attrsCache.IsEmpty()) {
-        obj = pkt->attrs();
-        wrapper->attrsCache = v8::UniquePersistent<v8::Object>(isolate, obj);
-      } else {
-        obj = v8::Local<v8::Object>::New(isolate, wrapper->attrsCache);
+      std::function<std::shared_ptr<Item>(
+          const std::unordered_map<std::string, std::shared_ptr<Layer>> &)>
+          findItem = [id, &findItem](
+              const std::unordered_map<std::string, std::shared_ptr<Layer>>
+                  &layers) -> std::shared_ptr<Item> {
+
+        if (layers.empty())
+          return std::shared_ptr<Item>();
+
+        std::vector<std::shared_ptr<Layer>> list;
+        for (const auto &pair : layers) {
+          list.push_back(pair.second);
+        }
+        std::sort(list.begin(), list.end(),
+                  [](const std::shared_ptr<Layer> &a,
+                     const std::shared_ptr<Layer> &b) {
+                    return b->confidence() < a->confidence();
+                  });
+
+        for (const std::shared_ptr<Layer> &layer : list) {
+          if (const std::shared_ptr<Item> &data = findItem(layer->layers())) {
+            return data;
+          } else if (const std::shared_ptr<Item> &data = layer->item(id)) {
+            return data;
+          }
+        }
+
+        return std::shared_ptr<Item>();
+      };
+
+      if (const std::shared_ptr<Item> &data = findItem(pkt->layers())) {
+        info.GetReturnValue().Set(
+            SessionItemValueWrapper::create(data->value()));
       }
-
-      info.GetReturnValue().Set(obj);
     }
   }
 

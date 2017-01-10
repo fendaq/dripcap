@@ -66,27 +66,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Layer_class.set("confidence", v8pp::property(&Layer::confidence));
   Layer_class.set("payload", v8pp::property(&Layer::payloadBuffer));
   Layer_class.set("layers", v8pp::property(&Layer::layersObject));
-  Layer_class.class_function_template()->PrototypeTemplate()->SetAccessor(
-      v8pp::to_v8(isolate, "attrs"),
-      [](Local<String>, const PropertyCallbackInfo<Value> &info) {
-        Isolate *isolate = Isolate::GetCurrent();
-        Local<String> key = v8pp::to_v8(isolate, "__attrs");
-        if (info.This()->Has(key)) {
-          info.GetReturnValue().Set(info.This()->Get(key));
-        }
-        Layer *layer = v8pp::class_<Layer>::unwrap_object(isolate, info.This());
-        if (layer) {
-          const auto &attrs = layer->attrs();
-          Local<Object> obj = v8::Object::New(isolate);
-          for (const auto &pair : attrs) {
-            obj->Set(
-                v8pp::to_v8(isolate, pair.first),
-                v8pp::class_<ItemValue>::create_object(isolate, pair.second));
-          }
-          info.This()->Set(key, obj);
-          info.GetReturnValue().Set(obj);
-        }
-      });
+  Layer_class.set("item", &Layer::itemObject);
 
   v8pp::class_<Item> Item_class(isolate);
   Item_class.ctor<const v8::FunctionCallbackInfo<v8::Value> &>();
@@ -94,6 +74,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Item_class.set("id", v8pp::property(&Item::id));
   Item_class.set("range", v8pp::property(&Item::range));
   Item_class.set("value", v8pp::property(&Item::valueObject));
+  Item_class.set("item", &Item::itemObject);
 
   v8pp::class_<ItemValue> ItemValue_class(isolate);
   ItemValue_class.ctor<const v8::FunctionCallbackInfo<v8::Value> &>();

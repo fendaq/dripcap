@@ -1,6 +1,4 @@
 import {Layer, Item, Value, StreamChunk} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import {IPv6Address} from 'driptool/ipv6';
 
 export default class IPv6Dissector {
@@ -10,8 +8,7 @@ export default class IPv6Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet::IPv6';
     layer.name = 'IPv6';
@@ -21,9 +18,9 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Version',
       id: 'version',
-      range: '0:1'
+      range: '0:1',
+      value: version
     });
-    layer.attrs.version = version;
 
     let trafficClass =
       ((parentLayer.payload.readUInt8(0, true) & 0b00001111) << 4) |
@@ -31,33 +28,33 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Traffic Class',
       id: 'trafficClass',
-      range: '0:2'
+      range: '0:2',
+      value: trafficClass
     });
-    layer.attrs.trafficClass = trafficClass;
 
     let flowLevel = parentLayer.payload.readUInt16BE(2) |
       ((parentLayer.payload.readUInt8(1, true) & 0b00001111) << 16);
     layer.items.push({
       name: 'Flow Label',
       id: 'flowLevel',
-      range: '1:4'
+      range: '1:4',
+      value: flowLevel
     });
-    layer.attrs.flowLevel = flowLevel;
 
     let payloadLength = parentLayer.payload.readUInt16BE(4);
     layer.items.push({
       name: 'Payload Length',
       id: 'payloadLength',
-      range: '4:6'
+      range: '4:6',
+      value: payloadLength
     });
-    layer.attrs.payloadLength = payloadLength;
 
     let nextHeader = parentLayer.payload.readUInt8(6);
     let nextHeaderRange = '6:7';
 
     layer.items.push({
       name: 'Next Header',
-      value: Enum(protocolTable, nextHeader),
+      value: nextHeader,
       range: nextHeaderRange
     });
 
@@ -65,25 +62,25 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Hop Limit',
       id: 'hopLimit',
-      range: '7:8'
+      range: '7:8',
+      value: hopLimit
     });
-    layer.attrs.hopLimit = hopLimit;
 
     let source = IPv6Address(parentLayer.payload.slice(8, 24));
     layer.items.push({
       name: 'Source IP Address',
       id: 'src',
-      range: '8:24'
+      range: '8:24',
+      value: source
     });
-    layer.attrs.src = source;
 
     let destination = IPv6Address(parentLayer.payload.slice(24, 40));
     layer.items.push({
       name: 'Destination IP Address',
       id: 'dst',
-      range: '24:40'
+      range: '24:40',
+      value: destination
     });
-    layer.attrs.dst = destination;
 
     let offset = 40;
     let ext = true;
@@ -127,7 +124,7 @@ export default class IPv6Dissector {
       nextHeaderRange = `${offset}:${offset + 1}`;
       item.items.unshift({
         name: 'Next Header',
-        value: Enum(protocolTable, nextHeader),
+        value: nextHeader,
         range: nextHeaderRange
       });
       layer.items.push(item);
@@ -135,7 +132,6 @@ export default class IPv6Dissector {
       offset += optlen;
     }
 
-    let protocol = Enum(protocolTable, nextHeader);
     let protocolName = protocolTable[nextHeader];
     if (protocolName != null) {
       layer.namespace = `::Ethernet::IPv6::<${protocolName}>`;
@@ -144,9 +140,18 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Protocol',
       id: 'protocol',
-      data: nextHeaderRange
+      data: nextHeaderRange,
+      value: nextHeader,
+      range: nextHeaderRange,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: nextHeaderRange,
+          value: protocolName
+        }
+      ]
     });
-    layer.attrs.protocol = protocol;
 
     layer.range = offset + ':';
     layer.payload = parentLayer.payload.slice(offset);
@@ -154,7 +159,8 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: offset + ':'
+      range: offset + ':',
+      value: layer.payload
     });
 
     layer.summary = `${source.data} -> ${destination.data}`;

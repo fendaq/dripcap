@@ -43,15 +43,13 @@ public:
   void addItem(v8::Local<v8::Object> obj);
   std::vector<std::shared_ptr<Item>> items() const;
   std::shared_ptr<Item> item(const std::string &id) const;
+  v8::Local<v8::Object> itemObject(const std::string &id) const;
 
   std::unique_ptr<Buffer> payload() const;
   std::unique_ptr<LargeBuffer> largePayload() const;
   void setPayload(std::unique_ptr<Buffer> buffer);
   void setPayloadBuffer(v8::Local<v8::Object> obj);
   v8::Local<v8::Object> payloadBuffer() const;
-
-  void setAttr(const std::string &name, v8::Local<v8::Value> obj);
-  std::unordered_map<std::string, ItemValue> attrs() const;
 
 private:
   class Private;

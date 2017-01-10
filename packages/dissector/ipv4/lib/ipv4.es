@@ -1,6 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import {IPv4Address} from 'driptool/ipv4';
 
 export default class Dissector {
@@ -10,8 +8,7 @@ export default class Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet::IPv4';
     layer.name = 'IPv4';
@@ -21,100 +18,105 @@ export default class Dissector {
     layer.items.push({
       name: 'Version',
       id: 'version',
-      range: '0:1'
+      range: '0:1',
+      value: version
     });
-    layer.attrs.version = version;
 
     let headerLength = parentLayer.payload.readUInt8(0) & 0b00001111;
     layer.items.push({
       name: 'Internet Header Length',
       id: 'headerLength',
-      range: '0:1'
+      range: '0:1',
+      value: headerLength
     });
-    layer.attrs.headerLength = headerLength;
 
     let type = parentLayer.payload.readUInt8(1);
     layer.items.push({
       name: 'Type of service',
       id: 'type',
-      range: '1:2'
+      range: '1:2',
+      value: type
     });
-    layer.attrs.type = type;
 
     let totalLength = parentLayer.payload.readUInt16BE(2);
     layer.items.push({
       name: 'Total Length',
       id: 'totalLength',
-      range: '2:4'
+      range: '2:4',
+      value: totalLength
     });
-    layer.attrs.totalLength = totalLength;
 
     let id = parentLayer.payload.readUInt16BE(4);
     layer.items.push({
       name: 'Identification',
       id: 'id',
-      range: '4:6'
+      range: '4:6',
+      value: id
     });
-    layer.attrs.id = id;
 
-    let flagTable = {
-      'reserved':      {value: 0x1, name: 'Reserved'},
-      'doNotFragment': {value: 0x2, name: 'Don\'t Fragment'},
-      'moreFragments': {value: 0x4, name: 'More Fragments'},
-    };
-
-    let flags = Flags(flagTable, (parentLayer.payload.readUInt8(6) >> 5) & 0x7);
+    let flags = (parentLayer.payload.readUInt8(6) >> 5) & 0x7;
 
     layer.items.push({
       name: 'Flags',
       id: 'flags',
       range: '6:7',
+      value: flags,
       items: [
         {
-          name: flagTable['reserved'].name,
+          name: 'Reserved',
           id: 'reserved',
-          range: '6:7'
+          range: '6:7',
+          value: !!(flags & 0x1)
         },
         {
-          name: flagTable['doNotFragment'].name,
+          name: 'Don\'t Fragment',
           id: 'doNotFragment',
-          range: '6:7'
+          range: '6:7',
+          value: !!(flags & 0x2)
         },
         {
-          name: flagTable['moreFragments'].name,
+          name: 'More Fragments',
           id: 'moreFragments',
-          range: '6:7'
+          range: '6:7',
+          value: !!(flags & 0x4)
         }
       ]
     });
-    layer.attrs.flags = flags;
 
     let fragmentOffset = parentLayer.payload.readUInt8(6) & 0b0001111111111111;
     layer.items.push({
       name: 'Fragment Offset',
       id: 'fragmentOffset',
       range: '6:8',
+      value: fragmentOffset
     });
-    layer.attrs.fragmentOffset = fragmentOffset;
 
     let ttl = parentLayer.payload.readUInt8(8);
     layer.items.push({
       name: 'TTL',
       id: 'ttl',
       range: '8:9',
+      value: ttl
     });
-    layer.attrs.ttl = ttl;
 
     let protocolNumber = parentLayer.payload.readUInt8(9);
-    let protocol = Enum(protocolTable, protocolNumber);
+    let protocolName = protocolTable[protocolNumber];
+
     layer.items.push({
       name: 'Protocol',
       id: 'protocol',
-      range: '9:10'
+      range: '9:10',
+      value: protocolNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '9:10',
+          value: protocolName
+        }
+      ]
     });
-    layer.attrs.protocol = protocol;
 
-    let protocolName = protocolTable[protocolNumber]
     if (protocolName != null) {
       layer.namespace = `::Ethernet::IPv4::<${protocolName}>`;
     }
@@ -124,31 +126,32 @@ export default class Dissector {
       name: 'Header Checksum',
       id: 'checksum',
       range: '10:12',
+      value: checksum
     });
-    layer.attrs.checksum = checksum;
 
     let source = IPv4Address(parentLayer.payload.slice(12, 16));
     layer.items.push({
       name: 'Source IP Address',
       id: 'src',
       range: '12:16',
+      value: source
     });
-    layer.attrs.src = source;
 
     let destination = IPv4Address(parentLayer.payload.slice(16, 20));
     layer.items.push({
       name: 'Destination IP Address',
       id: 'dst',
       range: '16:20',
+      value: destination
     });
-    layer.attrs.dst = destination;
 
     layer.range = '20:' + totalLength;
     layer.payload = parentLayer.payload.slice(20, totalLength.data);
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '20:' + totalLength
+      range: '20:' + totalLength,
+      value: layer.payload
     });
 
     layer.summary = `${source.data} -> ${destination.data}`;

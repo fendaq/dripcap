@@ -13,7 +13,6 @@ private:
   SessionItemWrapper &operator=(const SessionItemWrapper &) = delete;
 
   v8::UniquePersistent<v8::Object> itemsCache;
-  v8::UniquePersistent<v8::Object> attrsCache;
 
 public:
   static NAN_MODULE_INIT(Init) {
@@ -26,6 +25,7 @@ public:
     Nan::SetAccessor(otl, Nan::New("range").ToLocalChecked(), range);
     Nan::SetAccessor(otl, Nan::New("value").ToLocalChecked(), value);
     Nan::SetAccessor(otl, Nan::New("items").ToLocalChecked(), items);
+    SetPrototypeMethod(tpl, "item", getItem);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
   }
 
@@ -84,6 +84,19 @@ public:
     }
 
     info.GetReturnValue().Set(obj);
+  }
+
+  static NAN_METHOD(getItem) {
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    SessionItemWrapper *wrapper =
+        ObjectWrap::Unwrap<SessionItemWrapper>(info.Holder());
+
+    const std::string &id = v8pp::from_v8<std::string>(isolate, info[0], "");
+
+    if (const std::shared_ptr<Item> &child = wrapper->item->item(id)) {
+      info.GetReturnValue().Set(
+          SessionItemValueWrapper::create(child->value()));
+    }
   }
 
   static v8::Local<v8::Object> create(const std::shared_ptr<Item> &item) {

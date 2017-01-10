@@ -1,6 +1,4 @@
 import {Layer, Item, Value, StreamChunk} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import {IPv4Host} from 'driptool/ipv4';
 import {IPv6Host} from 'driptool/ipv6';
 
@@ -11,8 +9,7 @@ export default class Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = parentLayer.namespace.replace('<TCP>', 'TCP');
     layer.name = 'TCP';
@@ -22,144 +19,145 @@ export default class Dissector {
     layer.items.push({
       name: 'Source port',
       id: 'srcPort',
-      range: '0:2'
+      range: '0:2',
+      value: source
     });
-    layer.attrs.srcPort = source;
 
     let destination = parentLayer.payload.readUInt16BE(2);
     layer.items.push({
       name: 'Destination port',
       id: 'dstPort',
-      range: '2:4'
+      range: '2:4',
+      value: destination
     });
-    layer.attrs.dstPort = destination;
 
-    let srcAddr = parentLayer.attrs.src;
-    let dstAddr = parentLayer.attrs.dst;
+    let srcAddr = parentLayer.item('src');
+    let dstAddr = parentLayer.item('dst');
+    let src, dst;
+
     if (srcAddr.type === 'dripcap/ipv4/addr') {
-      layer.attrs.src = IPv4Host(srcAddr.data, source);
-      layer.attrs.dst = IPv4Host(dstAddr.data, destination);
+      src = IPv4Host(srcAddr.data, source);
+      dst = IPv4Host(dstAddr.data, destination);
     } else if (srcAddr.type === 'dripcap/ipv6/addr') {
-      layer.attrs.src = IPv6Host(srcAddr.data, source);
-      layer.attrs.dst = IPv6Host(dstAddr.data, destination);
+      src = IPv6Host(srcAddr.data, source);
+      dst = IPv6Host(dstAddr.data, destination);
     }
+    layer.items.push({ id: 'src', value: src });
+    layer.items.push({ id: 'dst', value: dst });
 
     let seq = parentLayer.payload.readUInt32BE(4);
     layer.items.push({
       name: 'Sequence number',
       id: 'seq',
-      range: '4:8'
+      range: '4:8',
+      value: seq
     });
-    layer.attrs.seq = seq;
 
     let ack = parentLayer.payload.readUInt32BE(8);
     layer.items.push({
       name: 'Acknowledgment number',
       id: 'ack',
-      range: '8:12'
+      range: '8:12',
+      value: ack
     });
-    layer.attrs.ack = ack;
 
     let dataOffset = parentLayer.payload.readUInt8(12) >> 4;
     layer.items.push({
       name: 'Data offset',
       id: 'dataOffset',
-      range: '12:13'
+      range: '12:13',
+      value: dataOffset
     });
-    layer.attrs.dataOffset = dataOffset;
 
-    let table = {
-      'NS': 0x1 << 8,
-      'CWR': 0x1 << 7,
-      'ECE': 0x1 << 6,
-      'URG': 0x1 << 5,
-      'ACK': 0x1 << 4,
-      'PSH': 0x1 << 3,
-      'RST': 0x1 << 2,
-      'SYN': 0x1 << 1,
-      'FIN': 0x1 << 0,
-    };
-
-    let flags = Flags(table, parentLayer.payload.readUInt8(13) |
-      ((parentLayer.payload.readUInt8(12) & 0x1) << 8));
+    let flags = parentLayer.payload.readUInt8(13) |
+      ((parentLayer.payload.readUInt8(12) & 0x1) << 8);
 
     layer.items.push({
       name: 'Flags',
       id: 'flags',
       data: '12:14',
+      value: flags,
       items: [
         {
           name: 'NS',
           id: 'NS',
-          range: '12:13'
+          range: '12:13',
+          value: !!(flags & 0b100000000)
         },
         {
           name: 'CWR',
           id: 'CWR',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b010000000)
         },
         {
           name: 'ECE',
           id: 'ECE',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b001000000)
         },
         {
           name: 'URG',
           id: 'URG',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000100000)
         },
         {
           name: 'ACK',
           id: 'ACK',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000010000)
         },
         {
           name: 'PSH',
           id: 'PSH',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000001000)
         },
         {
           name: 'RST',
           id: 'RST',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000000100)
         },
         {
           name: 'SYN',
           id: 'SYN',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000000010)
         },
         {
           name: 'FIN',
           id: 'FIN',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000000001)
         }
       ]
     });
-    layer.attrs.flags = flags;
 
     let window = parentLayer.payload.readUInt16BE(14);
     layer.items.push({
       name: 'Window size',
       id: 'window',
-      range: '14:16'
+      range: '14:16',
+      value: window
     });
-    layer.attrs.window = window;
 
     let checksum = parentLayer.payload.readUInt16BE(16);
     layer.items.push({
       name: 'Checksum',
       id: 'checksum',
-      range: '16:18'
+      range: '16:18',
+      value: checksum
     });
-    layer.attrs.checksum = checksum;
 
     let urgent = parentLayer.payload.readUInt16BE(18);
     layer.items.push({
       name: 'Urgent pointer',
       id: 'urgent',
-      range: '18:20'
-    })
-    layer.attrs.urgent = urgent;
+      range: '18:20',
+      value: urgent
+    });
 
     let optionDataOffset = dataOffset * 4;
     let optionItems = [];
@@ -261,12 +259,13 @@ export default class Dissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: optionDataOffset + ':'
+      range: optionDataOffset + ':',
+      value: layer.payload
     });
 
-    layer.summary = `${layer.attrs.src.data} -> ${layer.attrs.dst.data} seq:${seq} ack:${ack}`;
+    layer.summary = `${src.data} -> ${dst.data} seq:${seq} ack:${ack}`;
 
-    let id = layer.attrs.src.data + '/' + layer.attrs.dst.data;
+    let id = src.data + '/' + dst.data;
     let chunk = {
       namespace: parentLayer.namespace,
       id: id,
@@ -277,7 +276,7 @@ export default class Dissector {
       }
     };
 
-    if (flags.data['FIN'] && flags.data['ACK']) {
+    if (flags && 0b000010001) {
       chunk.end = true;
     }
 

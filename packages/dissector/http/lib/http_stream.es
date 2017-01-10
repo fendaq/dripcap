@@ -18,8 +18,7 @@ export default class Dissector {
         this.dec = this.decode();
 
         let layer = {
-          items: [],
-          attrs: {}
+          items: []
         };
         layer.namespace = chunk.namespace + '::HTTP';
         layer.name = 'HTTP';
@@ -35,27 +34,27 @@ export default class Dissector {
         layer.items.push({
           name: 'Method',
           id: 'method',
-          range: '0:' + cursor
+          range: '0:' + cursor,
+          value: method
         });
-        layer.attrs.method = method;
 
         let path = next.value.path;
         cursor++;
         layer.items.push({
           name: 'Path',
           id: 'path',
-          range: cursor + ':' + (cursor + path.length)
+          range: cursor + ':' + (cursor + path.length),
+          value: path
         });
-        layer.attrs.path = path;
 
         let version = next.value.version;
         cursor += path.length + 1;
         layer.items.push({
           name: 'Version',
           id: 'version',
-          range: cursor + ':' + (cursor + version.length)
+          range: cursor + ':' + (cursor + version.length),
+          value: version
         });
-        layer.attrs.version = version;
 
         for (let header of next.value.headers) {
           layer.items.push({
@@ -66,8 +65,9 @@ export default class Dissector {
           });
         }
 
-        layer.attrs.src = parentLayer.attrs.src;
-        layer.attrs.dst = parentLayer.attrs.dst;
+        layer.items.push({id: 'src', value: parentLayer.item('src')});
+        layer.items.push({id: 'dst', value: parentLayer.item('dst')});
+
         return new Layer(layer);
       }
     }

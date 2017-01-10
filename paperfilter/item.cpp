@@ -101,3 +101,10 @@ std::shared_ptr<Item> Item::item(const std::string &id) const {
   }
   return std::shared_ptr<Item>();
 }
+
+v8::Local<v8::Object> Item::itemObject(const std::string &id) const {
+  if (std::shared_ptr<Item> itemPtr = item(id)) {
+    return itemPtr->valueObject();
+  }
+  return v8::Local<v8::Object>();
+}
