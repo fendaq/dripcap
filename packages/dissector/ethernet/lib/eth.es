@@ -20,17 +20,17 @@ export default class Dissector {
     layer.items.push({
       name: 'Destination',
       id: 'dst',
-      range: '0:6'
+      range: '0:6',
+      value: destination
     });
-    layer.attrs.dst = destination;
 
     let source = MACAddress(parentLayer.payload.slice(6, 12));
     layer.items.push({
       name: 'Source',
       id: 'src',
-      range: '6:12'
+      range: '6:12',
+      value: source
     });
-    layer.attrs.src = source;
 
     let protocolName;
     let type = parentLayer.payload.readUInt16BE(12);
@@ -38,9 +38,9 @@ export default class Dissector {
       layer.items.push({
         name: 'Length',
         id: 'len',
-        range: '12:14'
+        range: '12:14',
+        value: type
       });
-      layer.attrs.len = type;
     } else {
       let table = {
         0x0800: 'IPv4',
@@ -55,9 +55,9 @@ export default class Dissector {
       layer.items.push({
         name: 'EtherType',
         id: 'etherType',
-        range: '12:14'
+        range: '12:14',
+        value: etherType
       });
-      layer.attrs.etherType = etherType;
 
       protocolName = table[type];
       if (protocolName != null) {

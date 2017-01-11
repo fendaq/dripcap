@@ -12,10 +12,18 @@
 namespace {
 v8::Local<v8::Value> fetchValue(v8::Local<v8::Value> value) {
   v8::Isolate *isolate = v8::Isolate::GetCurrent();
+  v8::Local<v8::Value> result = value;
   if (const Item *item = v8pp::class_<Item>::unwrap_object(isolate, value)) {
-    return item->value().data();
+    result = item->value().data();
   }
-  return value;
+  if (result->IsObject()) {
+    v8::Local<v8::Object> resultObj = result.As<v8::Object>();
+    v8::Local<v8::String> resultKey = v8pp::to_v8(isolate, "_filter");
+    if (resultObj->Has(resultKey)) {
+      result = resultObj->Get(resultKey);
+    }
+  }
+  return result;
 }
 }
 
