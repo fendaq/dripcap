@@ -93,12 +93,6 @@ FilterFunc makeFilter(const json11::Json &json) {
 
       if (result.IsEmpty()) {
         result = v8::Null(isolate);
-      } else if (result->IsObject()) {
-        v8::Local<v8::Object> resultObj = result.As<v8::Object>();
-        v8::Local<v8::String> resultKey = v8pp::to_v8(isolate, "_filter");
-        if (resultObj->Has(resultKey)) {
-          return resultObj->Get(resultKey);
-        }
       }
 
       return result;
