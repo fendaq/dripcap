@@ -150,6 +150,14 @@ std::shared_ptr<Item> Layer::item(const std::string &id) const {
   return std::shared_ptr<Item>();
 }
 
+v8::Local<v8::Object> Layer::itemObject(const std::string &id) const {
+  if (std::shared_ptr<Item> itemPtr = item(id)) {
+    Isolate *isolate = Isolate::GetCurrent();
+    return v8pp::class_<Item>::import_external(isolate, itemPtr.get());
+  }
+  return v8::Local<v8::Object>();
+}
+
 std::unique_ptr<LargeBuffer> Layer::largePayload() const {
   if (d->largePayload) {
     return std::unique_ptr<LargeBuffer>(new LargeBuffer(*d->largePayload));

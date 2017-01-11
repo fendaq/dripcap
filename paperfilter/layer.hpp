@@ -43,6 +43,7 @@ public:
   void addItem(v8::Local<v8::Object> obj);
   std::vector<std::shared_ptr<Item>> items() const;
   std::shared_ptr<Item> item(const std::string &id) const;
+  v8::Local<v8::Object> itemObject(const std::string &id) const;
 
   std::unique_ptr<Buffer> payload() const;
   std::unique_ptr<LargeBuffer> largePayload() const;
