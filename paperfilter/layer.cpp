@@ -152,8 +152,7 @@ std::shared_ptr<Item> Layer::item(const std::string &id) const {
 
 v8::Local<v8::Object> Layer::itemObject(const std::string &id) const {
   if (std::shared_ptr<Item> itemPtr = item(id)) {
-    Isolate *isolate = Isolate::GetCurrent();
-    return v8pp::class_<Item>::import_external(isolate, itemPtr.get());
+    return itemPtr->valueObject();
   }
   return v8::Local<v8::Object>();
 }

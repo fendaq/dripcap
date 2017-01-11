@@ -134,7 +134,6 @@ export default class Dissector {
       range: '12:16',
       value: source
     });
-    layer.attrs.src = source;
 
     let destination = IPv4Address(parentLayer.payload.slice(16, 20));
     layer.items.push({
@@ -143,7 +142,6 @@ export default class Dissector {
       range: '16:20',
       value: destination
     });
-    layer.attrs.dst = destination;
 
     layer.range = '20:' + totalLength;
     layer.payload = parentLayer.payload.slice(20, totalLength.data);

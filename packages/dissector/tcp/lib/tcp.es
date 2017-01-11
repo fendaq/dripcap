@@ -34,8 +34,8 @@ export default class Dissector {
     });
     layer.attrs.dstPort = destination;
 
-    let srcAddr = parentLayer.attrs.src;
-    let dstAddr = parentLayer.attrs.dst;
+    let srcAddr = parentLayer.item('src');
+    let dstAddr = parentLayer.item('dst');
     if (srcAddr.type === 'dripcap/ipv4/addr') {
       layer.attrs.src = IPv4Host(srcAddr.data, source);
       layer.attrs.dst = IPv4Host(dstAddr.data, destination);

@@ -73,7 +73,8 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Source IP Address',
       id: 'src',
-      range: '8:24'
+      range: '8:24',
+      value: source
     });
     layer.attrs.src = source;
 
@@ -81,7 +82,8 @@ export default class IPv6Dissector {
     layer.items.push({
       name: 'Destination IP Address',
       id: 'dst',
-      range: '24:40'
+      range: '24:40',
+      value: destination
     });
     layer.attrs.dst = destination;
 

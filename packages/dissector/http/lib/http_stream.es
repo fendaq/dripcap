@@ -66,8 +66,8 @@ export default class Dissector {
           });
         }
 
-        layer.attrs.src = parentLayer.attrs.src;
-        layer.attrs.dst = parentLayer.attrs.dst;
+        layer.attrs.src = parentLayer.item('src');
+        layer.attrs.dst = parentLayer.item('dst');
         return new Layer(layer);
       }
     }
