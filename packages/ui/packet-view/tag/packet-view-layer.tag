@@ -1,11 +1,11 @@
 <packet-view-layer>
   <p class="layer-name list-item" oncontextmenu={ layerContext } onclick={ toggleLayer } onmouseover={ layerRange } onmouseout={ rangeOut }>
     <i class={ fa: true, 'fa-arrow-circle-right': !visible, 'fa-arrow-circle-down': visible }></i>
-    <i class="fa fa-question-circle" if={ layer.confidence < 1.0 }></i>
+    <i class="fa fa-question-circle" show={ layer.confidence < 1.0 }></i>
     { layer.name }
     <i class="text-summary">{ layer.summary }</i>
   </p>
-  <ul if={ visible }>
+  <ul show={ visible }>
     <packet-view-item each={ field in layer.items } if={ field.name } layer={ parent.layer } parentObject={ parent.layer } path={ parent.layer.id }></packet-view-item>
     <li if={ layer.error }>
       <a class="text-label">Error:</a>
