@@ -24,6 +24,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Packet_class.set("ts_sec", v8pp::property(&Packet::ts_sec));
   Packet_class.set("ts_nsec", v8pp::property(&Packet::ts_nsec));
   Packet_class.set("length", v8pp::property(&Packet::length));
+  Packet_class.set("confidence", v8pp::property(&Packet::confidence));
   Packet_class.set("payload", v8pp::property(&Packet::payloadBuffer));
   Packet_class.set("layers", v8pp::property(&Packet::layersObject));
 

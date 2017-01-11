@@ -32,6 +32,7 @@ public:
 
   std::string name() const;
   std::string ns() const;
+  double confidence() const;
   v8::Local<v8::Value> timestamp() const;
   v8::Local<v8::Object> attrs() const;
 

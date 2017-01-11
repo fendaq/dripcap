@@ -32,6 +32,7 @@ public:
     Nan::SetAccessor(otl, Nan::New("layers").ToLocalChecked(), layers);
     Nan::SetAccessor(otl, Nan::New("name").ToLocalChecked(), name);
     Nan::SetAccessor(otl, Nan::New("namespace").ToLocalChecked(), ns);
+    Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
     Nan::SetAccessor(otl, Nan::New("timestamp").ToLocalChecked(), timestamp);
     Nan::SetAccessor(otl, Nan::New("attrs").ToLocalChecked(), attrs);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -135,6 +136,14 @@ public:
     if (const std::shared_ptr<const Packet> &pkt = wrapper->pkt.lock())
       info.GetReturnValue().Set(
           v8pp::to_v8(v8::Isolate::GetCurrent(), pkt->ns()));
+  }
+
+  static NAN_GETTER(confidence) {
+    SessionPacketWrapper *wrapper =
+        ObjectWrap::Unwrap<SessionPacketWrapper>(info.Holder());
+    if (const std::shared_ptr<const Packet> &pkt = wrapper->pkt.lock())
+      info.GetReturnValue().Set(
+          v8pp::to_v8(v8::Isolate::GetCurrent(), pkt->confidence()));
   }
 
   static NAN_GETTER(timestamp) {

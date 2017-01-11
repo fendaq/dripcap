@@ -164,6 +164,15 @@ std::string Packet::ns() const {
   }
 }
 
+double Packet::confidence() const {
+  const std::shared_ptr<Layer> &leaf = leafLayer(layers());
+  if (leaf) {
+    return leaf->confidence();
+  } else {
+    return 0;
+  }
+}
+
 v8::Local<v8::Value> Packet::timestamp() const {
   Isolate *isolate = Isolate::GetCurrent();
   return v8::Date::New(isolate, (d->ts_sec * 1000.0) + (d->ts_nsec / 1000.0));
