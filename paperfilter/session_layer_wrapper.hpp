@@ -36,6 +36,7 @@ public:
     Nan::SetAccessor(otl, Nan::New("attrs").ToLocalChecked(), attrs);
     Nan::SetAccessor(otl, Nan::New("range").ToLocalChecked(), range);
     Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
+    SetPrototypeMethod(tpl, "item", getItem);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
   }
 
@@ -163,6 +164,20 @@ public:
       }
 
       info.GetReturnValue().Set(obj);
+    }
+  }
+
+  static NAN_METHOD(getItem) {
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    SessionLayerWrapper *wrapper =
+        ObjectWrap::Unwrap<SessionLayerWrapper>(info.Holder());
+
+    if (const std::shared_ptr<const Layer> &layer = wrapper->layer.lock()) {
+      const std::string &id = v8pp::from_v8<std::string>(isolate, info[0], "");
+      if (const std::shared_ptr<Item>& child = layer->item(id)) {
+        info.GetReturnValue().Set(
+            SessionItemValueWrapper::create(child->value()));
+      }
     }
   }
 

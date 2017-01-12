@@ -173,6 +173,7 @@
       } else if (typeof opts.parentval === 'object' && id in opts.parentval) {
         this.val = opts.parentval[id];
       } else if (opts.parentobject.hasOwnProperty(id)) {
+        console.log(opts.parentobject)
         this.val = opts.parentobject[id];
       }
     }
