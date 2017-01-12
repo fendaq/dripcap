@@ -48,25 +48,25 @@ export default class Dissector {
     layer.items.push({
       name: 'Sequence number',
       id: 'seq',
-      range: '4:8'
+      range: '4:8',
+      value: seq
     });
-    layer.attrs.seq = seq;
 
     let ack = parentLayer.payload.readUInt32BE(8);
     layer.items.push({
       name: 'Acknowledgment number',
       id: 'ack',
-      range: '8:12'
+      range: '8:12',
+      value: ack
     });
-    layer.attrs.ack = ack;
 
     let dataOffset = parentLayer.payload.readUInt8(12) >> 4;
     layer.items.push({
       name: 'Data offset',
       id: 'dataOffset',
-      range: '12:13'
+      range: '12:13',
+      value: dataOffset
     });
-    layer.attrs.dataOffset = dataOffset;
 
     let table = {
       'NS': 0x1 << 8,
@@ -87,6 +87,7 @@ export default class Dissector {
       name: 'Flags',
       id: 'flags',
       data: '12:14',
+      value: flags,
       items: [
         {
           name: 'NS',
@@ -135,31 +136,30 @@ export default class Dissector {
         }
       ]
     });
-    layer.attrs.flags = flags;
 
     let window = parentLayer.payload.readUInt16BE(14);
     layer.items.push({
       name: 'Window size',
       id: 'window',
-      range: '14:16'
+      range: '14:16',
+      value: window
     });
-    layer.attrs.window = window;
 
     let checksum = parentLayer.payload.readUInt16BE(16);
     layer.items.push({
       name: 'Checksum',
       id: 'checksum',
-      range: '16:18'
+      range: '16:18',
+      value: checksum
     });
-    layer.attrs.checksum = checksum;
 
     let urgent = parentLayer.payload.readUInt16BE(18);
     layer.items.push({
       name: 'Urgent pointer',
       id: 'urgent',
-      range: '18:20'
-    })
-    layer.attrs.urgent = urgent;
+      range: '18:20',
+      value: urgent
+    });
 
     let optionDataOffset = dataOffset * 4;
     let optionItems = [];

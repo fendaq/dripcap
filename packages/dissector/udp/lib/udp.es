@@ -46,17 +46,17 @@ export default class UDPDissector {
     layer.items.push({
       name: 'Length',
       id: 'len',
-      range: '4:6'
+      range: '4:6',
+      value: length
     });
-    layer.attrs.len = length;
 
     let checksum = parentLayer.payload.readUInt16BE(6);
     layer.items.push({
       name: 'Checksum',
       id: 'checksum',
-      range: '6:8'
+      range: '6:8',
+      value: checksum
     });
-    layer.attrs.checksum = checksum;
 
     layer.range = '8:'+ length;
     layer.payload = parentLayer.payload.slice(8, length);
@@ -64,7 +64,8 @@ export default class UDPDissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '8:' + length
+      range: '8:' + length,
+      value: layer.payload
     });
 
     layer.summary = `${layer.attrs.src.data} -> ${layer.attrs.dst.data}`;
