@@ -170,10 +170,13 @@
         this.path = opts.layer.id + '.' + id;
         this.val = opts.layer.attrs[id].data;
         valType = opts.layer.attrs[id].type;
+      } else if (opts.parentobject.item && opts.parentobject.item(id)) {
+        let val = opts.parentobject.item(id)
+        this.val = val.data;
+        valType = val.type;
       } else if (typeof opts.parentval === 'object' && id in opts.parentval) {
         this.val = opts.parentval[id];
       } else if (opts.parentobject.hasOwnProperty(id)) {
-        console.log(opts.parentobject)
         this.val = opts.parentobject[id];
       }
     }
