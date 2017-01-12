@@ -57,92 +57,93 @@ export default class DNSDissector {
     layer.items.push({
       name: 'ID',
       id: 'id',
-      range: '0:2'
+      range: '0:2',
+      value: id
     });
-    layer.attrs.id = id;
 
     layer.items.push({
       name: 'Query/Response Flag',
       id: 'qr',
-      range: '2:3'
+      range: '2:3',
+      value: qr
     });
-    layer.attrs.qr = qr;
 
     layer.items.push({
       name: 'Operation Code',
       id: 'opcode',
-      range: '2:3'
+      range: '2:3',
+      value: opcode
     });
-    layer.attrs.opcode = opcode;
 
     layer.items.push({
       name: 'Authoritative Answer Flag',
       id: 'aa',
-      range: '2:3'
+      range: '2:3',
+      value: aa
     });
-    layer.attrs.aa = aa;
 
     layer.items.push({
       name: 'Truncation Flag',
       id: 'tc',
-      range: '2:3'
+      range: '2:3',
+      value: tc
     });
-    layer.attrs.tc = tc;
 
     layer.items.push({
       name: 'Recursion Desired',
       id: 'rd',
-      range: '2:3'
+      range: '2:3',
+      value: rd
     });
-    layer.attrs.rd = rd;
 
     layer.items.push({
       name: 'Recursion Available',
       id: 'ra',
-      range: '3:4'
+      range: '3:4',
+      value: ra
     });
-    layer.attrs.ra = ra;
 
     layer.items.push({
       name: 'Response Code',
       id: 'rcode',
-      range: '3:4'
+      range: '3:4',
+      value: rcode
     });
-    layer.attrs.rcode = rcode;
 
     layer.items.push({
       name: 'Question Count',
       id: 'qdCount',
-      range: '4:6'
+      range: '4:6',
+      value: qdCount
     });
-    layer.attrs.qdCount = qdCount;
 
     layer.items.push({
       name: 'Answer Record Count',
       id: 'anCount',
-      range: '6:8'
+      range: '6:8',
+      value: anCount
     });
-    layer.attrs.anCount = anCount;
 
     layer.items.push({
       name: 'Authority Record Count',
       id: 'nsCount',
-      range: '8:10'
+      range: '8:10',
+      value: nsCount
     });
-    layer.attrs.nsCount = nsCount;
 
     layer.items.push({
       name: 'Additional Record Count',
       id: 'arCount',
-      range: '10:12'
+      range: '10:12',
+      value: arCount
     });
-    layer.attrs.arCount = arCount;
 
     layer.payload = parentLayer.payload.slice(12);
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '12:'
+      range: '12:',
+      value: layer.payload
     });
 
     layer.summary = `[${opcodeName}] [${rcodeName}] qd:${qdCount} an:${anCount} ns:${nsCount} ar:${arCount}`;
