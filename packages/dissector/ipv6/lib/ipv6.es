@@ -1,5 +1,4 @@
 import {Layer, Item, Value, StreamChunk} from 'dripcap';
-import Enum from 'driptool/enum';
 import {IPv6Address} from 'driptool/ipv6';
 
 export default class IPv6Dissector {
@@ -55,7 +54,7 @@ export default class IPv6Dissector {
 
     layer.items.push({
       name: 'Next Header',
-      value: Enum(protocolTable, nextHeader),
+      value: nextHeader,
       range: nextHeaderRange
     });
 
@@ -125,7 +124,7 @@ export default class IPv6Dissector {
       nextHeaderRange = `${offset}:${offset + 1}`;
       item.items.unshift({
         name: 'Next Header',
-        value: Enum(protocolTable, nextHeader),
+        value: nextHeader,
         range: nextHeaderRange
       });
       layer.items.push(item);
@@ -133,7 +132,6 @@ export default class IPv6Dissector {
       offset += optlen;
     }
 
-    let protocol = Enum(protocolTable, nextHeader);
     let protocolName = protocolTable[nextHeader];
     if (protocolName != null) {
       layer.namespace = `::Ethernet::IPv6::<${protocolName}>`;
@@ -143,8 +141,16 @@ export default class IPv6Dissector {
       name: 'Protocol',
       id: 'protocol',
       data: nextHeaderRange,
-      value: protocol,
-      range: nextHeaderRange
+      value: nextHeader,
+      range: nextHeaderRange,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: nextHeaderRange,
+          value: protocolName
+        }
+      ]
     });
 
     layer.range = offset + ':';
