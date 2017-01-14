@@ -16,21 +16,35 @@ export default class ARPDissector {
     layer.id = 'arp';
 
     let htypeNumber = parentLayer.payload.readUInt16BE(0);
-    let htype = htypeNumber;
     layer.items.push({
       name: 'Hardware type',
       id: 'htype',
       range: '0:2',
-      value: htype
+      value: htypeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '0:2',
+          value: hardwareTable[htypeNumber]
+        }
+      ]
     });
 
     let ptypeNumber = parentLayer.payload.readUInt16BE(2);
-    let ptype = ptypeNumber;
     layer.items.push({
       name: 'Protocol type',
       id: 'ptype',
       range: '2:4',
-      value: ptype
+      value: ptypeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '2:4',
+          value: protocolTable[ptypeNumber]
+        }
+      ]
     });
 
     let hlen = parentLayer.payload.readUInt8(4);

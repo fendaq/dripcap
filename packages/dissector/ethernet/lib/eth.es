@@ -1,5 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Enum from 'driptool/enum';
 import MACAddress from 'driptool/mac';
 
 export default class Dissector {
@@ -9,8 +8,7 @@ export default class Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet';
     layer.name = 'Ethernet';
@@ -51,12 +49,20 @@ export default class Dissector {
         0x86DD: 'IPv6'
       };
 
-      let etherType = Enum(table, type);
+      let etherTypeName = table[type];
       layer.items.push({
         name: 'EtherType',
         id: 'etherType',
         range: '12:14',
-        value: etherType
+        value: type,
+        items: [
+          {
+            name: 'Name',
+            id: 'name',
+            range: '12:14',
+            value: etherTypeName
+          }
+        ]
       });
 
       protocolName = table[type];

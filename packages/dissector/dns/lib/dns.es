@@ -1,6 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 
 export default class DNSDissector {
   static get namespaces() {
@@ -8,13 +6,12 @@ export default class DNSDissector {
   }
 
   analyze(packet, parentLayer) {
-    if (parentLayer.attrs.srcPort.data !== 53 && parentLayer.attrs.dstPort.data !== 53) {
+    if (parentLayer.item('srcPort').data !== 53 && parentLayer.item('dstPort').data !== 53) {
       return;
     }
 
     let layer = {
       items: [],
-      attrs: {},
       namespace: parentLayer.namespace + '::DNS',
       name: 'DNS',
       id: 'dns',
@@ -30,7 +27,6 @@ export default class DNSDissector {
     if (!(opcodeNumber in operationTable)) {
       throw new Error('wrong DNS opcode');
     }
-    let opcode = Enum(operationTable, opcodeNumber);
     let opcodeName = operationTable[opcodeNumber];
 
     let aa = !!((flags0 >> 2) & 1);
@@ -46,7 +42,6 @@ export default class DNSDissector {
     if (!(rcodeNumber in recordTable)) {
       throw new Error('wrong DNS rcode');
     }
-    let rcode = Enum(recordTable, rcodeNumber);
     let rcodeName = recordTable[rcodeNumber];
 
     let qdCount = parentLayer.payload.readUInt16BE(4);
@@ -72,7 +67,15 @@ export default class DNSDissector {
       name: 'Operation Code',
       id: 'opcode',
       range: '2:3',
-      value: opcode
+      value: opcodeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '2:3',
+          value: opcodeName
+        }
+      ]
     });
 
     layer.items.push({
@@ -107,7 +110,15 @@ export default class DNSDissector {
       name: 'Response Code',
       id: 'rcode',
       range: '3:4',
-      value: rcode
+      value: rcodeNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '3:4',
+          value: rcodeName
+        }
+      ]
     });
 
     layer.items.push({

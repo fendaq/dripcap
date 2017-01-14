@@ -18,8 +18,7 @@ export default class Dissector {
         this.dec = this.decode();
 
         let layer = {
-          items: [],
-          attrs: {}
+          items: []
         };
         layer.namespace = chunk.namespace + '::HTTP';
         layer.name = 'HTTP';
@@ -66,8 +65,9 @@ export default class Dissector {
           });
         }
 
-        layer.attrs.src = parentLayer.item('src');
-        layer.attrs.dst = parentLayer.item('dst');
+        layer.items.push({id: 'src', value: parentLayer.item('src')});
+        layer.items.push({id: 'dst', value: parentLayer.item('dst')});
+
         return new Layer(layer);
       }
     }
