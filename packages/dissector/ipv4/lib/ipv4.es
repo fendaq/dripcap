@@ -10,8 +10,7 @@ export default class Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet::IPv4';
     layer.name = 'IPv4';
@@ -74,17 +73,20 @@ export default class Dissector {
         {
           name: flagTable['reserved'].name,
           id: 'reserved',
-          range: '6:7'
+          range: '6:7',
+          value: !!flags.data['reserved']
         },
         {
           name: flagTable['doNotFragment'].name,
           id: 'doNotFragment',
-          range: '6:7'
+          range: '6:7',
+          value: !!flags.data['doNotFragment']
         },
         {
           name: flagTable['moreFragments'].name,
           id: 'moreFragments',
-          range: '6:7'
+          range: '6:7',
+          value: !!flags.data['moreFragments']
         }
       ]
     });
