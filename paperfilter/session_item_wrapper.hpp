@@ -94,7 +94,7 @@ public:
 
     const std::string &id = v8pp::from_v8<std::string>(isolate, info[0], "");
 
-    if (const std::shared_ptr<Item>& child = wrapper->item->item(id)) {
+    if (const std::shared_ptr<Item> &child = wrapper->item->item(id)) {
       info.GetReturnValue().Set(
           SessionItemValueWrapper::create(child->value()));
     }

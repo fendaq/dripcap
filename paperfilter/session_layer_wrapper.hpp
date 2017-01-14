@@ -174,7 +174,7 @@ public:
 
     if (const std::shared_ptr<const Layer> &layer = wrapper->layer.lock()) {
       const std::string &id = v8pp::from_v8<std::string>(isolate, info[0], "");
-      if (const std::shared_ptr<Item>& child = layer->item(id)) {
+      if (const std::shared_ptr<Item> &child = layer->item(id)) {
         info.GetReturnValue().Set(
             SessionItemValueWrapper::create(child->value()));
       }
