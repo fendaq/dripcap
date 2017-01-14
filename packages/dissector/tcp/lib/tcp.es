@@ -1,6 +1,4 @@
 import {Layer, Item, Value, StreamChunk} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import {IPv4Host} from 'driptool/ipv4';
 import {IPv6Host} from 'driptool/ipv6';
 
@@ -68,20 +66,8 @@ export default class Dissector {
       value: dataOffset
     });
 
-    let table = {
-      'NS': 0x1 << 8,
-      'CWR': 0x1 << 7,
-      'ECE': 0x1 << 6,
-      'URG': 0x1 << 5,
-      'ACK': 0x1 << 4,
-      'PSH': 0x1 << 3,
-      'RST': 0x1 << 2,
-      'SYN': 0x1 << 1,
-      'FIN': 0x1 << 0,
-    };
-
-    let flags = Flags(table, parentLayer.payload.readUInt8(13) |
-      ((parentLayer.payload.readUInt8(12) & 0x1) << 8));
+    let flags = parentLayer.payload.readUInt8(13) |
+      ((parentLayer.payload.readUInt8(12) & 0x1) << 8);
 
     layer.items.push({
       name: 'Flags',
@@ -92,47 +78,56 @@ export default class Dissector {
         {
           name: 'NS',
           id: 'NS',
-          range: '12:13'
+          range: '12:13',
+          value: !!(flags & 0b100000000)
         },
         {
           name: 'CWR',
           id: 'CWR',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b010000000)
         },
         {
           name: 'ECE',
           id: 'ECE',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b001000000)
         },
         {
           name: 'URG',
           id: 'URG',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000100000)
         },
         {
           name: 'ACK',
           id: 'ACK',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000010000)
         },
         {
           name: 'PSH',
           id: 'PSH',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000001000)
         },
         {
           name: 'RST',
           id: 'RST',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000000100)
         },
         {
           name: 'SYN',
           id: 'SYN',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000000010)
         },
         {
           name: 'FIN',
           id: 'FIN',
-          range: '13:14'
+          range: '13:14',
+          value: !!(flags & 0b000000001)
         }
       ]
     });
@@ -261,7 +256,8 @@ export default class Dissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: optionDataOffset + ':'
+      range: optionDataOffset + ':',
+      value: layer.payload
     });
 
     layer.summary = `${layer.attrs.src.data} -> ${layer.attrs.dst.data} seq:${seq} ack:${ack}`;
@@ -277,7 +273,7 @@ export default class Dissector {
       }
     };
 
-    if (flags.data['FIN'] && flags.data['ACK']) {
+    if (flags && 0b000010001) {
       chunk.end = true;
     }
 
