@@ -9,8 +9,7 @@ export default class Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = parentLayer.namespace.replace('<TCP>', 'TCP');
     layer.name = 'TCP';
@@ -20,27 +19,31 @@ export default class Dissector {
     layer.items.push({
       name: 'Source port',
       id: 'srcPort',
-      range: '0:2'
+      range: '0:2',
+      value: source
     });
-    layer.attrs.srcPort = source;
 
     let destination = parentLayer.payload.readUInt16BE(2);
     layer.items.push({
       name: 'Destination port',
       id: 'dstPort',
-      range: '2:4'
+      range: '2:4',
+      value: destination
     });
-    layer.attrs.dstPort = destination;
 
     let srcAddr = parentLayer.item('src');
     let dstAddr = parentLayer.item('dst');
+    let src, dst;
+
     if (srcAddr.type === 'dripcap/ipv4/addr') {
-      layer.attrs.src = IPv4Host(srcAddr.data, source);
-      layer.attrs.dst = IPv4Host(dstAddr.data, destination);
+      src = IPv4Host(srcAddr.data, source);
+      dst = IPv4Host(dstAddr.data, destination);
     } else if (srcAddr.type === 'dripcap/ipv6/addr') {
-      layer.attrs.src = IPv6Host(srcAddr.data, source);
-      layer.attrs.dst = IPv6Host(dstAddr.data, destination);
+      src = IPv6Host(srcAddr.data, source);
+      dst = IPv6Host(dstAddr.data, destination);
     }
+    layer.items.push({ id: 'src', value: src });
+    layer.items.push({ id: 'dst', value: dst });
 
     let seq = parentLayer.payload.readUInt32BE(4);
     layer.items.push({
@@ -260,9 +263,9 @@ export default class Dissector {
       value: layer.payload
     });
 
-    layer.summary = `${layer.attrs.src.data} -> ${layer.attrs.dst.data} seq:${seq} ack:${ack}`;
+    layer.summary = `${src.data} -> ${dst.data} seq:${seq} ack:${ack}`;
 
-    let id = layer.attrs.src.data + '/' + layer.attrs.dst.data;
+    let id = src.data + '/' + dst.data;
     let chunk = {
       namespace: parentLayer.namespace,
       id: id,
