@@ -150,7 +150,8 @@ export default class Dissector {
     layer.items.push({
       name: 'Payload',
       id: 'payload',
-      range: '20:' + totalLength
+      range: '20:' + totalLength,
+      value: layer.payload
     });
 
     layer.summary = `${source.data} -> ${destination.data}`;
