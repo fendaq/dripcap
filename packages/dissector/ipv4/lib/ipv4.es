@@ -1,6 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import {IPv4Address} from 'driptool/ipv4';
 
 export default class Dissector {
@@ -56,13 +54,7 @@ export default class Dissector {
       value: id
     });
 
-    let flagTable = {
-      'reserved':      {value: 0x1, name: 'Reserved'},
-      'doNotFragment': {value: 0x2, name: 'Don\'t Fragment'},
-      'moreFragments': {value: 0x4, name: 'More Fragments'},
-    };
-
-    let flags = Flags(flagTable, (parentLayer.payload.readUInt8(6) >> 5) & 0x7);
+    let flags = (parentLayer.payload.readUInt8(6) >> 5) & 0x7;
 
     layer.items.push({
       name: 'Flags',
@@ -71,22 +63,22 @@ export default class Dissector {
       value: flags,
       items: [
         {
-          name: flagTable['reserved'].name,
+          name: 'Reserved',
           id: 'reserved',
           range: '6:7',
-          value: !!flags.data['reserved']
+          value: !!(flags & 0x1)
         },
         {
-          name: flagTable['doNotFragment'].name,
+          name: 'Don\'t Fragment',
           id: 'doNotFragment',
           range: '6:7',
-          value: !!flags.data['doNotFragment']
+          value: !!(flags & 0x2)
         },
         {
-          name: flagTable['moreFragments'].name,
+          name: 'More Fragments',
           id: 'moreFragments',
           range: '6:7',
-          value: !!flags.data['moreFragments']
+          value: !!(flags & 0x4)
         }
       ]
     });
@@ -108,15 +100,23 @@ export default class Dissector {
     });
 
     let protocolNumber = parentLayer.payload.readUInt8(9);
-    let protocol = Enum(protocolTable, protocolNumber);
+    let protocolName = protocolTable[protocolNumber];
+
     layer.items.push({
       name: 'Protocol',
       id: 'protocol',
       range: '9:10',
-      value: protocol
+      value: protocolNumber,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '9:10',
+          value: protocolName
+        }
+      ]
     });
 
-    let protocolName = protocolTable[protocolNumber]
     if (protocolName != null) {
       layer.namespace = `::Ethernet::IPv4::<${protocolName}>`;
     }
