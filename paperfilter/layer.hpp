@@ -51,9 +51,6 @@ public:
   void setPayloadBuffer(v8::Local<v8::Object> obj);
   v8::Local<v8::Object> payloadBuffer() const;
 
-  void setAttr(const std::string &name, v8::Local<v8::Value> obj);
-  std::unordered_map<std::string, ItemValue> attrs() const;
-
 private:
   class Private;
   std::shared_ptr<Private> d;

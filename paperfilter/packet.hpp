@@ -34,7 +34,6 @@ public:
   std::string ns() const;
   double confidence() const;
   v8::Local<v8::Value> timestamp() const;
-  v8::Local<v8::Object> attrs() const;
 
   std::unique_ptr<Buffer> payload() const;
   std::unique_ptr<LargeBuffer> largePayload() const;

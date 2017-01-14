@@ -18,7 +18,6 @@ private:
 
   v8::UniquePersistent<v8::Object> layersCache;
   v8::UniquePersistent<v8::Object> itemsCache;
-  v8::UniquePersistent<v8::Object> attrsCache;
 
 public:
   static NAN_MODULE_INIT(Init) {
@@ -33,7 +32,6 @@ public:
     Nan::SetAccessor(otl, Nan::New("layers").ToLocalChecked(), layers);
     Nan::SetAccessor(otl, Nan::New("payload").ToLocalChecked(), payload);
     Nan::SetAccessor(otl, Nan::New("items").ToLocalChecked(), items);
-    Nan::SetAccessor(otl, Nan::New("attrs").ToLocalChecked(), attrs);
     Nan::SetAccessor(otl, Nan::New("range").ToLocalChecked(), range);
     Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
     SetPrototypeMethod(tpl, "item", getItem);
@@ -136,31 +134,6 @@ public:
         wrapper->itemsCache = v8::UniquePersistent<v8::Object>(isolate, obj);
       } else {
         obj = v8::Local<v8::Object>::New(isolate, wrapper->itemsCache);
-      }
-
-      info.GetReturnValue().Set(obj);
-    }
-  }
-
-  static NAN_GETTER(attrs) {
-    v8::Isolate *isolate = v8::Isolate::GetCurrent();
-    SessionLayerWrapper *wrapper =
-        ObjectWrap::Unwrap<SessionLayerWrapper>(info.Holder());
-
-    if (const std::shared_ptr<const Layer> &layer = wrapper->layer.lock()) {
-
-      v8::Local<v8::Object> obj;
-
-      if (wrapper->attrsCache.IsEmpty()) {
-        const auto &attrs = layer->attrs();
-        obj = v8::Object::New(isolate);
-        for (const auto &pair : attrs) {
-          obj->Set(v8pp::to_v8(isolate, pair.first),
-                   SessionItemValueWrapper::create(pair.second));
-        }
-        wrapper->attrsCache = v8::UniquePersistent<v8::Object>(isolate, obj);
-      } else {
-        obj = v8::Local<v8::Object>::New(isolate, wrapper->attrsCache);
       }
 
       info.GetReturnValue().Set(obj);

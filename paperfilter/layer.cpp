@@ -19,7 +19,6 @@ public:
   std::weak_ptr<Packet> pkt;
   std::vector<std::shared_ptr<Item>> items;
   std::map<std::string, size_t> keys;
-  std::unordered_map<std::string, ItemValue> attrs;
   std::unique_ptr<Buffer> payload;
   std::unique_ptr<LargeBuffer> largePayload;
 };
@@ -43,18 +42,6 @@ Layer::Layer(v8::Local<v8::Object> options) : d(std::make_shared<Private>()) {
       v8::Local<v8::Value> item = items->Get(i);
       if (item->IsObject())
         addItem(item.As<v8::Object>());
-    }
-  }
-
-  v8::Local<v8::Object> attrs;
-  if (v8pp::get_option(isolate, options, "attrs", attrs)) {
-    v8::Local<v8::Array> keys = attrs->GetPropertyNames();
-    for (uint32_t i = 0; i < keys->Length(); ++i) {
-      v8::Local<v8::Value> key = keys->Get(i);
-      const std::string &keyStr = v8pp::from_v8<std::string>(isolate, key, "");
-      if (!keyStr.empty()) {
-        setAttr(keyStr, attrs->Get(key));
-      }
     }
   }
 
@@ -193,17 +180,4 @@ v8::Local<v8::Object> Layer::payloadBuffer() const {
   } else {
     return v8::Local<v8::Object>();
   }
-}
-
-void Layer::setAttr(const std::string &name, v8::Local<v8::Value> obj) {
-  Isolate *isolate = Isolate::GetCurrent();
-  if (ItemValue *item = v8pp::class_<ItemValue>::unwrap_object(isolate, obj)) {
-    d->attrs.emplace(name, *item);
-  } else {
-    d->attrs.emplace(name, ItemValue(obj));
-  }
-}
-
-std::unordered_map<std::string, ItemValue> Layer::attrs() const {
-  return d->attrs;
 }

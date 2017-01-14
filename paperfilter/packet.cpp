@@ -28,23 +28,6 @@ std::shared_ptr<Layer> leafLayer(
     return layer;
   }
 }
-
-void getAttrs(
-    const std::unordered_map<std::string, std::shared_ptr<Layer>> &layers,
-    std::unordered_map<std::string, ItemValue> *values) {
-  for (const auto &pair : layers) {
-    getAttrs(pair.second->layers(), values);
-  }
-  for (const auto &pair : layers) {
-    const std::shared_ptr<Layer> &layer = pair.second;
-    const std::unordered_map<std::string, ItemValue> &attrs = layer->attrs();
-    for (const auto &vpair : attrs) {
-      if (values->count(vpair.first) == 0) {
-        values->insert(vpair);
-      }
-    }
-  }
-}
 }
 
 using namespace v8;
@@ -176,19 +159,6 @@ double Packet::confidence() const {
 v8::Local<v8::Value> Packet::timestamp() const {
   Isolate *isolate = Isolate::GetCurrent();
   return v8::Date::New(isolate, (d->ts_sec * 1000.0) + (d->ts_nsec / 1000.0));
-}
-
-v8::Local<v8::Object> Packet::attrs() const {
-  Isolate *isolate = Isolate::GetCurrent();
-  std::unordered_map<std::string, ItemValue> values;
-  getAttrs(layers(), &values);
-
-  v8::Local<v8::Object> obj = v8::Object::New(isolate);
-  for (const auto &pair : values) {
-    obj->Set(v8pp::to_v8(isolate, pair.first),
-             SessionItemValueWrapper::create(pair.second));
-  }
-  return obj;
 }
 
 v8::Local<v8::Object> Packet::payloadBuffer() const {

@@ -34,7 +34,6 @@ public:
     Nan::SetAccessor(otl, Nan::New("namespace").ToLocalChecked(), ns);
     Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
     Nan::SetAccessor(otl, Nan::New("timestamp").ToLocalChecked(), timestamp);
-    Nan::SetAccessor(otl, Nan::New("attrs").ToLocalChecked(), attrs);
     SetPrototypeMethod(tpl, "item", getItem);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
   }
@@ -152,24 +151,6 @@ public:
         ObjectWrap::Unwrap<SessionPacketWrapper>(info.Holder());
     if (const std::shared_ptr<const Packet> &pkt = wrapper->pkt.lock())
       info.GetReturnValue().Set(pkt->timestamp());
-  }
-
-  static NAN_GETTER(attrs) {
-    v8::Isolate *isolate = v8::Isolate::GetCurrent();
-    SessionPacketWrapper *wrapper =
-        ObjectWrap::Unwrap<SessionPacketWrapper>(info.Holder());
-    if (const std::shared_ptr<const Packet> &pkt = wrapper->pkt.lock()) {
-      v8::Local<v8::Object> obj;
-
-      if (wrapper->attrsCache.IsEmpty()) {
-        obj = pkt->attrs();
-        wrapper->attrsCache = v8::UniquePersistent<v8::Object>(isolate, obj);
-      } else {
-        obj = v8::Local<v8::Object>::New(isolate, wrapper->attrsCache);
-      }
-
-      info.GetReturnValue().Set(obj);
-    }
   }
 
   static NAN_METHOD(getItem) {

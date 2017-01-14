@@ -61,12 +61,7 @@ FilterFunc makeFilter(const json11::Json &json) {
 
       if (const Layer *layer =
               v8pp::class_<Layer>::unwrap_object(isolate, value)) {
-        const std::unordered_map<std::string, ItemValue> &attrs =
-            layer->attrs();
-        const auto it = attrs.find(name);
-        if (it != attrs.end()) {
-          result = it->second.data();
-        } else if (const std::shared_ptr<Item> &item = layer->item(name)) {
+        if (const std::shared_ptr<Item> &item = layer->item(name)) {
           result = v8pp::class_<Item>::reference_external(isolate, item.get());
         }
       } else if (const Item *item =

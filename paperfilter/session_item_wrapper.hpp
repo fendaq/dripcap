@@ -13,7 +13,6 @@ private:
   SessionItemWrapper &operator=(const SessionItemWrapper &) = delete;
 
   v8::UniquePersistent<v8::Object> itemsCache;
-  v8::UniquePersistent<v8::Object> attrsCache;
 
 public:
   static NAN_MODULE_INIT(Init) {
