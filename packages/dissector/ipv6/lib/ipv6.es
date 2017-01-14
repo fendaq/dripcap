@@ -10,8 +10,7 @@ export default class IPv6Dissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet::IPv6';
     layer.name = 'IPv6';
@@ -76,7 +75,6 @@ export default class IPv6Dissector {
       range: '8:24',
       value: source
     });
-    layer.attrs.src = source;
 
     let destination = IPv6Address(parentLayer.payload.slice(24, 40));
     layer.items.push({
@@ -85,7 +83,6 @@ export default class IPv6Dissector {
       range: '24:40',
       value: destination
     });
-    layer.attrs.dst = destination;
 
     let offset = 40;
     let ext = true;
@@ -147,7 +144,8 @@ export default class IPv6Dissector {
       name: 'Protocol',
       id: 'protocol',
       data: nextHeaderRange,
-      value: protocol
+      value: protocol,
+      range: nextHeaderRange
     });
 
     layer.range = offset + ':';
