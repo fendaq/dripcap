@@ -1,6 +1,4 @@
 import {Layer, Item, Value} from 'dripcap';
-import Flags from 'driptool/flags';
-import Enum from 'driptool/enum';
 import MACAddress from 'driptool/mac';
 import {IPv4Address} from 'driptool/ipv4';
 
@@ -11,15 +9,14 @@ export default class ARPDissector {
 
   analyze(packet, parentLayer) {
     let layer = {
-      items: [],
-      attrs: {}
+      items: []
     };
     layer.namespace = '::Ethernet::ARP';
     layer.name = 'ARP';
     layer.id = 'arp';
 
     let htypeNumber = parentLayer.payload.readUInt16BE(0);
-    let htype = Enum(hardwareTable, htypeNumber);
+    let htype = htypeNumber;
     layer.items.push({
       name: 'Hardware type',
       id: 'htype',
@@ -28,7 +25,7 @@ export default class ARPDissector {
     });
 
     let ptypeNumber = parentLayer.payload.readUInt16BE(2);
-    let ptype = Enum(protocolTable, ptypeNumber);
+    let ptype = ptypeNumber;
     layer.items.push({
       name: 'Protocol type',
       id: 'ptype',
@@ -53,13 +50,21 @@ export default class ARPDissector {
     });
 
     let operationNumber = parentLayer.payload.readUInt16BE(6);
-    let operation = Enum(operationTable, operationNumber);
+    let operation = operationNumber;
     let operationName = operationTable[operationNumber];
     layer.items.push({
       name: 'Operation',
       id: 'operation',
       range: '6:8',
-      value: operation
+      value: operation,
+      items: [
+        {
+          name: 'Name',
+          id: 'name',
+          range: '6:8',
+          value: operationName
+        }
+      ]
     });
 
     let sha = MACAddress(parentLayer.payload.slice(8, 14));
