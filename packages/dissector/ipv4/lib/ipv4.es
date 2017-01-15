@@ -62,14 +62,14 @@ export default class Dissector {
       'More Fragments':  0x4,
     }
 
-    let flagNumber = (parentLayer.payload.readUInt8(6) >> 5) & 0x7;
-    let flags = new Flags(flagTable, flagNumber);
+    let flagValue = (parentLayer.payload.readUInt8(6) >> 5) & 0x7;
+    let flags = new Flags(flagTable, flagValue);
 
     layer.items.push({
       name: 'Flags',
       id: 'flags',
       range: '6:7',
-      value: flagNumber,
+      value: flagValue,
       summary: flags.toString(),
       items: [
         {

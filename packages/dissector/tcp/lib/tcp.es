@@ -1,4 +1,5 @@
 import {Layer, Item, Value, StreamChunk} from 'dripcap';
+import Flags from 'driptool/flags';
 import {IPv4Host} from 'driptool/ipv4';
 import {IPv6Host} from 'driptool/ipv6';
 
@@ -69,68 +70,82 @@ export default class Dissector {
       value: dataOffset
     });
 
-    let flags = parentLayer.payload.readUInt8(13) |
+    let flagValue = parentLayer.payload.readUInt8(13) |
       ((parentLayer.payload.readUInt8(12) & 0x1) << 8);
+
+    let table = {
+      'NS':  0x1 << 8,
+      'CWR': 0x1 << 7,
+      'ECE': 0x1 << 6,
+      'URG': 0x1 << 5,
+      'ACK': 0x1 << 4,
+      'PSH': 0x1 << 3,
+      'RST': 0x1 << 2,
+      'SYN': 0x1 << 1,
+      'FIN': 0x1 << 0,
+    };
+    let flags = new Flags(table, flagValue);
 
     layer.items.push({
       name: 'Flags',
       id: 'flags',
       data: '12:14',
-      value: flags,
+      value: flagValue,
+      summary: flags.toString(),
       items: [
         {
           name: 'NS',
           id: 'NS',
           range: '12:13',
-          value: !!(flags & 0b100000000)
+          value: flags.get('NS')
         },
         {
           name: 'CWR',
           id: 'CWR',
           range: '13:14',
-          value: !!(flags & 0b010000000)
+          value: flags.get('CWR')
         },
         {
           name: 'ECE',
           id: 'ECE',
           range: '13:14',
-          value: !!(flags & 0b001000000)
+          value: flags.get('ECE')
         },
         {
           name: 'URG',
           id: 'URG',
           range: '13:14',
-          value: !!(flags & 0b000100000)
+          value: flags.get('URG')
         },
         {
           name: 'ACK',
           id: 'ACK',
           range: '13:14',
-          value: !!(flags & 0b000010000)
+          value: flags.get('ACK')
         },
         {
           name: 'PSH',
           id: 'PSH',
           range: '13:14',
-          value: !!(flags & 0b000001000)
+          value: flags.get('PSH')
         },
         {
           name: 'RST',
           id: 'RST',
           range: '13:14',
-          value: !!(flags & 0b000000100)
+          value: flags.get('RST')
         },
         {
           name: 'SYN',
           id: 'SYN',
           range: '13:14',
-          value: !!(flags & 0b000000010)
+          value: flags.get('SYN')
         },
         {
           name: 'FIN',
           id: 'FIN',
           range: '13:14',
-          value: !!(flags & 0b000000001)
+          value: flags.get('FIN')
         }
       ]
     });
@@ -276,7 +291,7 @@ export default class Dissector {
       }
     };
 
-    if (flags && 0b000010001) {
+    if (flags.get('ACK') && flags.get('FIN')) {
       chunk.end = true;
     }
 
