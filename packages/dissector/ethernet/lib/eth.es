@@ -1,4 +1,5 @@
 import {Layer, Item, Value} from 'dripcap';
+import Enum from 'driptool/enum';
 import MACAddress from 'driptool/mac';
 
 export default class Dissector {
@@ -49,18 +50,19 @@ export default class Dissector {
         0x86DD: 'IPv6'
       };
 
-      let etherTypeName = table[type];
+      let etherType = new Enum(table, type);
       layer.items.push({
         name: 'EtherType',
         id: 'etherType',
         range: '12:14',
         value: type,
+        summary: etherType.toString(),
         items: [
           {
             name: 'Name',
             id: 'name',
             range: '12:14',
-            value: etherTypeName
+            value: etherType.toString()
           }
         ]
       });

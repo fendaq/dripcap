@@ -1,4 +1,6 @@
 import {Layer, Item, Value} from 'dripcap';
+import Enum from 'driptool/enum';
+import Flags from 'driptool/flags';
 import {IPv4Address} from 'driptool/ipv4';
 
 export default class Dissector {
@@ -54,31 +56,39 @@ export default class Dissector {
       value: id
     });
 
-    let flags = (parentLayer.payload.readUInt8(6) >> 5) & 0x7;
+    let flagTable = {
+      'Reserved':        0x1,
+      'Don\'t Fragment': 0x2,
+      'More Fragments':  0x4,
+    }
+
+    let flagNumber = (parentLayer.payload.readUInt8(6) >> 5) & 0x7;
+    let flags = new Flags(flagTable, flagNumber);
 
     layer.items.push({
       name: 'Flags',
       id: 'flags',
       range: '6:7',
-      value: flags,
+      value: flagNumber,
+      summary: flags.toString(),
       items: [
         {
           name: 'Reserved',
           id: 'reserved',
           range: '6:7',
-          value: !!(flags & 0x1)
+          value: flags.get('Reserved')
         },
         {
           name: 'Don\'t Fragment',
           id: 'doNotFragment',
           range: '6:7',
-          value: !!(flags & 0x2)
+          value: flags.get('Don\'t Fragment')
         },
         {
           name: 'More Fragments',
           id: 'moreFragments',
           range: '6:7',
-          value: !!(flags & 0x4)
+          value: flags.get('More Fragments')
         }
       ]
     });
@@ -100,25 +110,26 @@ export default class Dissector {
     });
 
     let protocolNumber = parentLayer.payload.readUInt8(9);
-    let protocolName = protocolTable[protocolNumber];
+    let protocol = new Enum(protocolTable, protocolNumber);
 
     layer.items.push({
       name: 'Protocol',
       id: 'protocol',
       range: '9:10',
       value: protocolNumber,
+      summary: protocol.toString(),
       items: [
         {
           name: 'Name',
           id: 'name',
           range: '9:10',
-          value: protocolName
+          value: protocol.toString()
         }
       ]
     });
 
-    if (protocolName != null) {
-      layer.namespace = `::Ethernet::IPv4::<${protocolName}>`;
+    if (protocolNumber in protocolTable) {
+      layer.namespace = `::Ethernet::IPv4::<${protocol.toString()}>`;
     }
 
     let checksum = parentLayer.payload.readUInt16BE(10);
@@ -155,8 +166,8 @@ export default class Dissector {
     });
 
     layer.summary = `${source.data} -> ${destination.data}`;
-    if (protocolName != null) {
-      layer.summary = `[${protocolName}] ` + layer.summary;
+    if (protocolNumber in protocolTable) {
+      layer.summary = `[${protocol.toString()}] ` + layer.summary;
     }
 
     return new Layer(layer);
