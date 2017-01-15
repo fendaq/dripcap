@@ -1,4 +1,5 @@
 import {Layer, Item, Value} from 'dripcap';
+import Enum from 'driptool/enum';
 import MACAddress from 'driptool/mac';
 import {IPv4Address} from 'driptool/ipv4';
 
@@ -16,33 +17,37 @@ export default class ARPDissector {
     layer.id = 'arp';
 
     let htypeNumber = parentLayer.payload.readUInt16BE(0);
+    let htype = new Enum(hardwareTable, htypeNumber);
     layer.items.push({
       name: 'Hardware type',
       id: 'htype',
       range: '0:2',
       value: htypeNumber,
+      summary: htype.toString(),
       items: [
         {
           name: 'Name',
           id: 'name',
           range: '0:2',
-          value: hardwareTable[htypeNumber]
+          value: htype.toString()
         }
       ]
     });
 
     let ptypeNumber = parentLayer.payload.readUInt16BE(2);
+    let ptype = new Enum(protocolTable, ptypeNumber);
     layer.items.push({
       name: 'Protocol type',
       id: 'ptype',
       range: '2:4',
       value: ptypeNumber,
+      summary: ptype.toString(),
       items: [
         {
           name: 'Name',
           id: 'name',
           range: '2:4',
-          value: protocolTable[ptypeNumber]
+          value: ptype.toString()
         }
       ]
     });
@@ -64,19 +69,19 @@ export default class ARPDissector {
     });
 
     let operationNumber = parentLayer.payload.readUInt16BE(6);
-    let operation = operationNumber;
-    let operationName = operationTable[operationNumber];
+    let operation = new Enum(operationTable, operationNumber);
     layer.items.push({
       name: 'Operation',
       id: 'operation',
       range: '6:8',
-      value: operation,
+      value: operationNumber,
+      summary: operation.toString(),
       items: [
         {
           name: 'Name',
           id: 'name',
           range: '6:8',
-          value: operationName
+          value: operation.toString()
         }
       ]
     });
@@ -113,7 +118,7 @@ export default class ARPDissector {
       value: tpa
     });
 
-    layer.summary = `[${operationName.toUpperCase()}] ${sha.data}-${spa.data} -> ${tha.data}-${tpa.data}`;
+    layer.summary = `[${operation.toString()}] ${sha.data}-${spa.data} -> ${tha.data}-${tpa.data}`;
 
     return new Layer(layer);
   }
@@ -129,6 +134,6 @@ let protocolTable = {
 };
 
 let operationTable = {
-  0x1: 'request',
-  0x2: 'reply'
+  0x1: 'REQUEST',
+  0x2: 'REPLY'
 };
