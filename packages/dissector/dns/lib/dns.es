@@ -1,4 +1,5 @@
 import {Layer, Item, Value} from 'dripcap';
+import Enum from 'driptool/enum';
 
 export default class DNSDissector {
   static get namespaces() {
@@ -27,7 +28,7 @@ export default class DNSDissector {
     if (!(opcodeNumber in operationTable)) {
       throw new Error('wrong DNS opcode');
     }
-    let opcodeName = operationTable[opcodeNumber];
+    let opcode = new Enum(operationTable, opcodeNumber);
 
     let aa = !!((flags0 >> 2) & 1);
     let tc = !!((flags0 >> 1) & 1);
@@ -42,7 +43,7 @@ export default class DNSDissector {
     if (!(rcodeNumber in recordTable)) {
       throw new Error('wrong DNS rcode');
     }
-    let rcodeName = recordTable[rcodeNumber];
+    let rcode = new Enum(recordTable, rcodeNumber);
 
     let qdCount = parentLayer.payload.readUInt16BE(4);
     let anCount = parentLayer.payload.readUInt16BE(6);
@@ -68,12 +69,13 @@ export default class DNSDissector {
       id: 'opcode',
       range: '2:3',
       value: opcodeNumber,
+      summary: opcode.toString(),
       items: [
         {
           name: 'Name',
           id: 'name',
           range: '2:3',
-          value: opcodeName
+          value: opcode.toString()
         }
       ]
     });
@@ -111,12 +113,13 @@ export default class DNSDissector {
       id: 'rcode',
       range: '3:4',
       value: rcodeNumber,
+      summary: rcode.toString(),
       items: [
         {
           name: 'Name',
           id: 'name',
           range: '3:4',
-          value: rcodeName
+          value: rcode.toString()
         }
       ]
     });
@@ -157,7 +160,7 @@ export default class DNSDissector {
       value: layer.payload
     });
 
-    layer.summary = `[${opcodeName}] [${rcodeName}] qd:${qdCount} an:${anCount} ns:${nsCount} ar:${arCount}`;
+    layer.summary = `[${opcode.toString()}] [${rcode.toString()}] qd:${qdCount} an:${anCount} ns:${nsCount} ar:${arCount}`;
     return new Layer(layer);
   }
 }
