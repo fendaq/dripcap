@@ -73,6 +73,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Item_class.set("name", v8pp::property(&Item::name));
   Item_class.set("id", v8pp::property(&Item::id));
   Item_class.set("range", v8pp::property(&Item::range));
+  Item_class.set("summary", v8pp::property(&Item::summary));
   Item_class.set("value", v8pp::property(&Item::valueObject));
   Item_class.set("item", &Item::itemObject);
 

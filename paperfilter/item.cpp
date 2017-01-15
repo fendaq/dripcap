@@ -11,6 +11,7 @@ public:
   std::string name;
   std::string id;
   std::string range;
+  std::string summary;
   ItemValue value;
   std::vector<std::shared_ptr<Item>> items;
   std::map<std::string, size_t> keys;
@@ -29,6 +30,7 @@ Item::Item(v8::Local<v8::Value> value) : d(new Private()) {
     v8pp::get_option(isolate, obj, "name", d->name);
     v8pp::get_option(isolate, obj, "id", d->id);
     v8pp::get_option(isolate, obj, "range", d->range);
+    v8pp::get_option(isolate, obj, "summary", d->summary);
 
     v8::Local<v8::Value> value;
     if (v8pp::get_option(isolate, obj, "value", value)) {
@@ -70,6 +72,10 @@ v8::Local<v8::Object> Item::valueObject() const {
   return v8pp::class_<ItemValue>::import_external(isolate,
                                                   new ItemValue(d->value));
 }
+
+std::string Item::summary() const { return d->summary; }
+
+void Item::setSummary(const std::string &summary) { d->summary = summary; }
 
 ItemValue Item::value() const { return d->value; }
 

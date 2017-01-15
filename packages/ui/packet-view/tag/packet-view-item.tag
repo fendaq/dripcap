@@ -95,6 +95,7 @@
     <packet-view-buffer-value if={ type=='buffer' } val={ val }></packet-view-buffer-value>
     <packet-view-stream-value if={ type=='stream' } val={ val }></packet-view-stream-value>
     <packet-view-custom-value if={ type=='custom' } tag={ tag } val={ val }></packet-view-custom-value>
+    <a class="text-label">{ field.summary }</a>
   </p>
   <ul show={ field.items.length && show }>
     <packet-view-item each={ field in field.items } if={ field.name } layer={ parent.layer } parentObject={ parent.field } parentVal={ parent.val } path={ parent.path }></packet-view-item>

@@ -22,6 +22,8 @@ public:
   void setId(const std::string &id);
   std::string range() const;
   void setRange(const std::string &range);
+  std::string summary() const;
+  void setSummary(const std::string &summary);
   v8::Local<v8::Object> valueObject() const;
   ItemValue value() const;
   void setValue(v8::Local<v8::Object> value);
