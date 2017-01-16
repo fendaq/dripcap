@@ -65,8 +65,8 @@ export default class Dissector {
           });
         }
 
-        layer.items.push({id: 'src', value: parentLayer.item('src')});
-        layer.items.push({id: 'dst', value: parentLayer.item('dst')});
+        layer.items.push({id: 'src', value: parentLayer.getValue('src')});
+        layer.items.push({id: 'dst', value: parentLayer.getValue('dst')});
 
         return new Layer(layer);
       }

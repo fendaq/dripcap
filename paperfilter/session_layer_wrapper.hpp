@@ -34,7 +34,7 @@ public:
     Nan::SetAccessor(otl, Nan::New("items").ToLocalChecked(), items);
     Nan::SetAccessor(otl, Nan::New("range").ToLocalChecked(), range);
     Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
-    SetPrototypeMethod(tpl, "item", getItem);
+    SetPrototypeMethod(tpl, "getValue", getValue);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
   }
 
@@ -140,7 +140,7 @@ public:
     }
   }
 
-  static NAN_METHOD(getItem) {
+  static NAN_METHOD(getValue) {
     v8::Isolate *isolate = v8::Isolate::GetCurrent();
     SessionLayerWrapper *wrapper =
         ObjectWrap::Unwrap<SessionLayerWrapper>(info.Holder());

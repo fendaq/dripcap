@@ -266,9 +266,9 @@
           this.cells.filter(`[data-packet=${pkt.seq}]:visible`)
             .empty()
             .append($('<a>').text(pkt.name))
-            .append($('<a>').text(pkt.item('src').data))
+            .append($('<a>').text(pkt.getValue('src').data))
             .append($('<a>').append($('<i class="fa fa-angle-double-right">')))
-            .append($('<a>').text(pkt.item('dst').data))
+            .append($('<a>').text(pkt.getValue('dst').data))
             .append($('<a>').text(pkt.length));
         });
       }

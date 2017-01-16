@@ -167,8 +167,8 @@
     let id = this.field.id;
     if (id) {
       this.path = opts.path + '.' + id;
-      if (opts.parentobject.item && opts.parentobject.item(id)) {
-        let val = opts.parentobject.item(id)
+      if (opts.parentobject.getValue && opts.parentobject.getValue(id)) {
+        let val = opts.parentobject.getValue(id)
         this.val = val.data;
         valType = val.type;
       } else if (typeof opts.parentval === 'object' && id in opts.parentval) {

@@ -7,7 +7,7 @@ export default class DNSDissector {
   }
 
   analyze(packet, parentLayer) {
-    if (parentLayer.item('srcPort').data !== 53 && parentLayer.item('dstPort').data !== 53) {
+    if (parentLayer.getValue('srcPort').data !== 53 && parentLayer.getValue('dstPort').data !== 53) {
       return;
     }
 

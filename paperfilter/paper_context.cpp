@@ -66,7 +66,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Layer_class.set("confidence", v8pp::property(&Layer::confidence));
   Layer_class.set("payload", v8pp::property(&Layer::payloadBuffer));
   Layer_class.set("layers", v8pp::property(&Layer::layersObject));
-  Layer_class.set("item", &Layer::itemObject);
+  Layer_class.set("getValue", &Layer::itemObject);
 
   v8pp::class_<Item> Item_class(isolate);
   Item_class.ctor<const v8::FunctionCallbackInfo<v8::Value> &>();
@@ -75,7 +75,7 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Item_class.set("range", v8pp::property(&Item::range));
   Item_class.set("summary", v8pp::property(&Item::summary));
   Item_class.set("value", v8pp::property(&Item::valueObject));
-  Item_class.set("item", &Item::itemObject);
+  Item_class.set("getValue", &Item::itemObject);
 
   v8pp::class_<ItemValue> ItemValue_class(isolate);
   ItemValue_class.ctor<const v8::FunctionCallbackInfo<v8::Value> &>();

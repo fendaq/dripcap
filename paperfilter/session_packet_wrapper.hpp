@@ -34,7 +34,7 @@ public:
     Nan::SetAccessor(otl, Nan::New("namespace").ToLocalChecked(), ns);
     Nan::SetAccessor(otl, Nan::New("confidence").ToLocalChecked(), confidence);
     Nan::SetAccessor(otl, Nan::New("timestamp").ToLocalChecked(), timestamp);
-    SetPrototypeMethod(tpl, "item", getItem);
+    SetPrototypeMethod(tpl, "getValue", getValue);
     constructor().Reset(Nan::GetFunction(tpl).ToLocalChecked());
   }
 
@@ -153,7 +153,7 @@ public:
       info.GetReturnValue().Set(pkt->timestamp());
   }
 
-  static NAN_METHOD(getItem) {
+  static NAN_METHOD(getValue) {
     v8::Isolate *isolate = v8::Isolate::GetCurrent();
     SessionPacketWrapper *wrapper =
         ObjectWrap::Unwrap<SessionPacketWrapper>(info.Holder());

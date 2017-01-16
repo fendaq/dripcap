@@ -31,8 +31,8 @@ export default class UDPDissector {
       value: destination
     });
 
-    let srcAddr = parentLayer.item('src');
-    let dstAddr = parentLayer.item('dst');
+    let srcAddr = parentLayer.getValue('src');
+    let dstAddr = parentLayer.getValue('dst');
     let src, dst;
 
     if (srcAddr.type === 'dripcap/ipv4/addr') {
