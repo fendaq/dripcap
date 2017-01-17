@@ -12,6 +12,7 @@ Caffeinated packet analyzer
 
 - Mac OS X (dmg)
 - Linux (deb)
-- Windows (zip)
+- Linux (rpm)
+- Windows (installer exe)
 
 https://github.com/dripcap/dripcap/releases
