@@ -57,6 +57,10 @@ class Config {
   _save() {
     return fs.writeFileSync(this._path, JSON.stringify(this._data, null, '  '));
   }
+
+  getData() {
+    return this._data;
+  }
 }
 
 export default class Profile {
@@ -89,18 +93,25 @@ export default class Profile {
   getConfig(key) {
     return this._config.get(key);
   }
+
   setConfig(key, value) {
     return this._config.set(key, value);
   }
+
   watchConfig(key, handler) {
     return this._config.watch(key, handler);
   }
+
   unwatchConfig(key, handler) {
     return this._config.unwatch(key, handler);
   }
 
   getKeymap() {
     return this._keyMap;
+  }
+
+  getData() {
+    return this._config.getData();
   }
 
   getPackageConfig(name) {

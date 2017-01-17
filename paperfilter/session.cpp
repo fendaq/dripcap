@@ -19,6 +19,7 @@
 #include <uv.h>
 #include <v8pp/class.hpp>
 #include <v8pp/object.hpp>
+#include <v8pp/json.hpp>
 
 using namespace v8;
 
@@ -42,6 +43,7 @@ public:
   std::unique_ptr<PacketDispatcher> packetDispatcher;
   std::unordered_map<std::string, FilterContext> filterThreads;
   std::string ns;
+  std::string config;
 
   UniquePersistent<Function> statusCb;
   UniquePersistent<Function> logCb;
@@ -309,6 +311,11 @@ void Session::reset(v8::Local<v8::Object> opt) {
 
   v8pp::get_option(isolate, opt, "namespace", d->ns);
 
+  v8::Local<v8::Object> config;
+  if (v8pp::get_option(isolate, opt, "config", config)) {
+    d->config = v8pp::json_str(isolate, config);
+  }
+
   d->threads = std::thread::hardware_concurrency();
   v8pp::get_option(isolate, opt, "threads", d->threads);
   d->threads = std::max(1, d->threads - 1);
@@ -338,6 +345,7 @@ void Session::reset(v8::Local<v8::Object> opt) {
 
   auto dissCtx = std::make_shared<PacketDispatcher::Context>();
   dissCtx->threads = d->threads;
+  dissCtx->config = d->config;
   dissCtx->packetCb = [this](
       const std::vector<std::shared_ptr<Packet>> &packets) {
     d->store->insert(packets);
@@ -353,6 +361,7 @@ void Session::reset(v8::Local<v8::Object> opt) {
 
   auto streamCtx = std::make_shared<StreamDispatcher::Context>();
   streamCtx->threads = d->threads;
+  streamCtx->config = d->config;
   streamCtx->dissectors.swap(streamDissectors);
   streamCtx->logCb =
       std::bind(&Private::log, std::ref(d), std::placeholders::_1);

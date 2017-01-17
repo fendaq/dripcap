@@ -150,6 +150,16 @@ export default class PackageHub {
     }, 500);
   }
 
+  getConfigData() {
+    let data = {
+      _: this._profile.getData()
+    };
+    for (let pkg in this.list) {
+      data[pkg] = this._profile.getPackageConfig(pkg).getData();
+    }
+    return data;
+  }
+
   load(name) {
     let pkg = this.list[name];
     if (pkg == null) {

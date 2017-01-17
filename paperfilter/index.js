@@ -66,7 +66,8 @@ class Session extends EventEmitter {
     let sessOption = {
       namespace: option.namespace,
       dissectors: [],
-      stream_dissectors: []
+      stream_dissectors: [],
+      config: option.config
     };
     let errors = [];
     let tasks = [];

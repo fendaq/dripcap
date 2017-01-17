@@ -32,6 +32,7 @@ StreamDispatcher::Private::Private(const std::shared_ptr<Context> &ctx)
     : ctx(ctx) {
 
   auto dissCtx = std::make_shared<StreamDissectorThread::Context>();
+  dissCtx->config = ctx->config;
   dissCtx->vpLayersCb = ctx->vpLayersCb;
   dissCtx->streamsCb = ctx->streamsCb;
   dissCtx->logCb = ctx->logCb;

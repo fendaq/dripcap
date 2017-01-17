@@ -14,6 +14,7 @@ struct LogMessage;
 class StreamDissectorThread {
 public:
   struct Context {
+    std::string config;
     std::vector<Dissector> dissectors;
     std::function<void(const LogMessage &)> logCb;
     std::function<void(std::vector<std::unique_ptr<StreamChunk>>)> streamsCb;

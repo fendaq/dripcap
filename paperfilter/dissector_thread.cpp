@@ -15,6 +15,7 @@
 #include <v8pp/class.hpp>
 #include <v8pp/object.hpp>
 #include <v8pp/context.hpp>
+#include <v8pp/json.hpp>
 
 using namespace v8;
 
@@ -136,7 +137,9 @@ DissectorThread::Private::Private(
             }
           }
 
-          v8::Local<v8::Object> obj = func->NewInstance();
+          v8::Handle<v8::Value> args[1] = {
+              v8pp::json_parse(isolate, ctx.config)};
+          v8::Local<v8::Object> obj = func->NewInstance(1, args);
           if (obj.IsEmpty()) {
             if (ctx.logCb) {
               ctx.logCb(

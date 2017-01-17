@@ -2,9 +2,10 @@ import { EventEmitter } from 'events';
 import paperfilter from 'paperfilter';
 
 export default class Session extends EventEmitter {
-  constructor(pubsub) {
+  constructor(pubsub, pkg) {
     super();
     this._pubsub = pubsub;
+    this._pkg = pkg;
     this._dissectors = [];
     this._streamDissectors = [];
     this._filterHints = {};
@@ -67,7 +68,8 @@ export default class Session extends EventEmitter {
     let option = {
       namespace: '::<Ethernet>',
       dissectors: this._dissectors,
-      stream_dissectors: this._streamDissectors
+      stream_dissectors: this._streamDissectors,
+      config: this._pkg.getConfigData()
     };
 
     let sess = await paperfilter.Session.create(option);

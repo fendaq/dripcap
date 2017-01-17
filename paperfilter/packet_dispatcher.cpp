@@ -18,6 +18,7 @@ public:
 PacketDispatcher::Private::Private(const std::shared_ptr<Context> &ctx)
     : dissCtx(std::make_shared<DissectorSharedContext>()) {
 
+  dissCtx->config = ctx->config;
   dissCtx->dissectors = ctx->dissectors;
   dissCtx->packetCb = ctx->packetCb;
   dissCtx->streamsCb = ctx->streamsCb;

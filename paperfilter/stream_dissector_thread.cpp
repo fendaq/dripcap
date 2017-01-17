@@ -16,6 +16,7 @@
 #include <v8pp/class.hpp>
 #include <v8pp/object.hpp>
 #include <v8pp/context.hpp>
+#include <v8pp/json.hpp>
 
 using namespace v8;
 
@@ -165,7 +166,10 @@ StreamDissectorThread::Private::Private(const std::shared_ptr<Context> &ctx)
                findDessector(chunk->ns(), dissectors, &nsMap)) {
             v8::Local<v8::Function> func =
                 v8::Local<v8::Function>::New(isolate, diss->func);
-            v8::Local<v8::Object> obj = func->NewInstance();
+
+            v8::Handle<v8::Value> args[1] = {
+                v8pp::json_parse(isolate, ctx.config)};
+            v8::Local<v8::Object> obj = func->NewInstance(1, args);
             if (obj.IsEmpty()) {
               if (ctx.logCb) {
                 ctx.logCb(LogMessage::fromMessage(try_catch.Message(),

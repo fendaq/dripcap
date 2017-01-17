@@ -24,6 +24,7 @@ export default function(argv, profileName = 'default') {
   let profile = new Profile(path.join(Env.profilePath, profileName));
   let pubsub = new PubSub();
   let layout = new Layout(pubsub);
+  let pkg = new PackageHub(pubsub, profile);
   let dripcap = {
     Argv: argv,
     Env: Env,
@@ -31,11 +32,11 @@ export default function(argv, profileName = 'default') {
     Theme: new Theme(pubsub, profile.getConfig('theme')),
     Menu: new Menu(),
     Layout: layout,
-    Package: new PackageHub(pubsub, profile),
+    Package: pkg,
     KeyBind: new KeyBind(profile, pubsub),
     PubSub: pubsub,
     Logger: new Logger(pubsub),
-    Session: new Session(pubsub)
+    Session: new Session(pubsub, pkg)
   };
 
   let module = require('module');
