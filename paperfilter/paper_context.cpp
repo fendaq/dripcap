@@ -44,6 +44,8 @@ void initModule(v8pp::module *module, v8::Isolate *isolate) {
   Buffer_class.set("readUInt8", &Buffer::readUInt8);
   Buffer_class.set("readUInt16BE", &Buffer::readUInt16BE);
   Buffer_class.set("readUInt32BE", &Buffer::readUInt32BE);
+  Buffer_class.set("readDoubleBE", &Buffer::readDoubleBE);
+  Buffer_class.set("readFloatBE", &Buffer::readFloatBE);
 
   Buffer_class.class_function_template()
       ->PrototypeTemplate()

@@ -248,6 +248,37 @@ void Buffer::readUInt32BE(
   }
 }
 
+void Buffer::readDoubleBE(
+    const v8::FunctionCallbackInfo<v8::Value> &args) const {
+  Isolate *isolate = Isolate::GetCurrent();
+  size_t offset = v8pp::from_v8<size_t>(isolate, args[0], 0);
+  bool noassert = v8pp::from_v8<bool>(isolate, args[1], true);
+  if (!noassert && offset + sizeof(double) > length()) {
+    args.GetReturnValue().Set(v8pp::throw_ex(isolate, "index out of range"));
+  } else {
+    const char buf[8] = {data(offset)[7], data(offset)[6], data(offset)[5],
+                         data(offset)[4], data(offset)[3], data(offset)[2],
+                         data(offset)[1], data(offset)[0]};
+    double num = *reinterpret_cast<const double *>(buf);
+    args.GetReturnValue().Set(num);
+  }
+}
+
+void Buffer::readFloatBE(
+    const v8::FunctionCallbackInfo<v8::Value> &args) const {
+  Isolate *isolate = Isolate::GetCurrent();
+  size_t offset = v8pp::from_v8<size_t>(isolate, args[0], 0);
+  bool noassert = v8pp::from_v8<bool>(isolate, args[1], true);
+  if (!noassert && offset + sizeof(float) > length()) {
+    args.GetReturnValue().Set(v8pp::throw_ex(isolate, "index out of range"));
+  } else {
+    const char buf[4] = {data(offset)[3], data(offset)[2], data(offset)[1],
+                         data(offset)[0]};
+    float num = *reinterpret_cast<const float *>(buf);
+    args.GetReturnValue().Set(num);
+  }
+}
+
 void Buffer::toString(const v8::FunctionCallbackInfo<v8::Value> &args) const {
   Isolate *isolate = Isolate::GetCurrent();
   const std::string &type =
