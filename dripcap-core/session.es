@@ -76,6 +76,13 @@ export default class Session extends EventEmitter {
     sess.interface = options.ifs || '';
     sess.name = options.name || '';
 
+    for (let dev of paperfilter.Session.devices) {
+      if (dev.id === sess.interface) {
+        sess.name = dev.name;
+        break;
+      }
+    }
+
     if (options.filter != null) {
       sess.setBPF(options.filter);
     }
