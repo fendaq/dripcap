@@ -265,10 +265,7 @@
         process.nextTick(() => {
           this.cells.filter(`[data-packet=${pkt.seq}]:visible`)
             .empty()
-            .append($('<a>').text(pkt.name))
-            .append($('<a>').text(pkt.getValue('src').data))
-            .append($('<a>').append($('<i class="fa fa-angle-double-right">')))
-            .append($('<a>').text(pkt.getValue('dst').data))
+            .append($('<a>').append($('<a class="name">').text(pkt.name)).append($('<a class="summary">').text(pkt.summary)))
             .append($('<a>').text(pkt.length));
         });
       }
@@ -308,17 +305,26 @@
             text-overflow: ellipsis;
             width: 0;
           }
-          a:nth-child(2),
-          a:nth-child(4) {
+          a:nth-child(1) {
             flex-grow: 4;
           }
-          a:nth-child(3) {
+          a.name {
+            padding: 0;
+            color: var(--color-classes);
+          }
+          a.summary {
+            margin-left: 10px;
+          }
+          a:nth-child(2) {
             flex-grow: 0.5;
             text-align: center;
           }
           &.selected {
             color: var(--color-default-background);
             background-color: var(--color-variables);
+            a.name {
+              color: var(--color-background);
+            }
           }
           &:hover {
             border-left-color: var(--color-variables);
