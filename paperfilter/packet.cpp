@@ -43,7 +43,6 @@ public:
   uint32_t ts_nsec = 0;
   uint32_t length = 0;
   bool vpacket = false;
-  std::string summary;
   std::unique_ptr<Buffer> payload;
   std::unique_ptr<LargeBuffer> largePayload;
   std::unordered_map<std::string, std::shared_ptr<Layer>> layers;
@@ -57,7 +56,6 @@ Packet::Packet(v8::Local<v8::Object> option) : d(new Private()) {
   Isolate *isolate = Isolate::GetCurrent();
   v8pp::get_option(isolate, option, "ts_sec", d->ts_sec);
   v8pp::get_option(isolate, option, "ts_nsec", d->ts_nsec);
-  v8pp::get_option(isolate, option, "summary", d->summary);
   v8pp::get_option(isolate, option, "length", d->length);
   Local<Value> payload = option->Get(v8pp::to_v8(isolate, "payload"));
   if (node::Buffer::HasInstance(payload)) {
@@ -105,7 +103,13 @@ uint32_t Packet::ts_sec() const { return d->ts_sec; }
 
 uint32_t Packet::ts_nsec() const { return d->ts_nsec; }
 
-std::string Packet::summary() const { return d->summary; }
+std::string Packet::summary() const {
+  const std::shared_ptr<Layer> &leaf = leafLayer(layers());
+  if (leaf) {
+    return leaf->summary();
+  }
+  return std::string();
+}
 
 bool Packet::vpacket() const { return d->vpacket; }
 
@@ -200,7 +204,6 @@ std::unique_ptr<Packet> Packet::shallowClone() {
   pkt->d->ts_nsec = d->ts_nsec;
   pkt->d->length = d->length;
   pkt->d->vpacket = d->vpacket;
-  pkt->d->summary = d->summary;
   if (d->payload) {
     pkt->d->payload = d->payload->slice();
   }
