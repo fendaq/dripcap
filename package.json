@@ -32,7 +32,7 @@
     "mousetrap": "^1.6.0",
     "msgpack-lite": "^0.1.26",
     "node-notifier": "^4.6.1",
-    "npm": "^4.1.1",
+    "npm": "^4.1.2",
     "paperfilter": "file:./paperfilter",
     "request": "^2.79.0",
     "rimraf": "^2.5.4",
@@ -55,7 +55,7 @@
     "babel-register": "^6.22.0",
     "electron": "1.4.15",
     "electron-packager": "^8.5.1",
-    "electron-winstaller": "^2.5.1",
+    "electron-winstaller": "^2.5.2",
     "gulp": "^3.9.1",
     "gulp-atom-electron": "^1.10.0",
     "gulp-babel": "^6.1.2",
@@ -67,7 +67,7 @@
     "gulp-vinyl-zip": "^1.4.0",
     "msgpack-lite": "^0.1.26",
     "nan": "^2.5.1",
-    "spectron": "^3.4.1"
+    "spectron": "^3.5.0"
   },
   "babel": {
     "plugins": [
