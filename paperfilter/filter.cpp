@@ -12,6 +12,7 @@
 namespace {
 v8::Local<v8::Value> fetchValue(v8::Local<v8::Value> value) {
   v8::Isolate *isolate = v8::Isolate::GetCurrent();
+  if (value.IsEmpty()) return v8::Null(isolate);
   v8::Local<v8::Value> result = value;
   if (const Item *item = v8pp::class_<Item>::unwrap_object(isolate, value)) {
     result = item->value().data();
