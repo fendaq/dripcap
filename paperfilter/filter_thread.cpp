@@ -87,7 +87,7 @@ FilterThread::Private::Private(const std::shared_ptr<Context> &ctx) : ctx(ctx) {
               ctx.store->get(start, end);
           std::vector<std::pair<uint32_t, bool>> results;
           for (const auto &pkt : packets) {
-            v8::Local<v8::Value> result = func(pkt.get());
+            v8::Local<v8::Value> result = func(pkt.get()).value;
             ctx.packets.insert(pkt->seq(), result->BooleanValue());
           }
           lock.lock();

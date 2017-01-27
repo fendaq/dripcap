@@ -12,7 +12,8 @@
 namespace {
 v8::Local<v8::Value> fetchValue(v8::Local<v8::Value> value) {
   v8::Isolate *isolate = v8::Isolate::GetCurrent();
-  if (value.IsEmpty()) return v8::Null(isolate);
+  if (value.IsEmpty())
+    return v8::Null(isolate);
   v8::Local<v8::Value> result = value;
   if (const Item *item = v8pp::class_<Item>::unwrap_object(isolate, value)) {
     result = item->value().data();
@@ -25,6 +26,9 @@ v8::Local<v8::Value> fetchValue(v8::Local<v8::Value> value) {
     }
   }
   return result;
+}
+v8::Local<v8::Value> fetchValue(const FilterResult &result) {
+  return fetchValue(result.value);
 }
 }
 
@@ -41,7 +45,7 @@ FilterFunc makeFilter(const json11::Json &json) {
     if (propertyType == "Identifier") {
       const std::string &name = property["name"].string_value();
       propertyFunc = [isolate, name](Packet *) {
-        return v8pp::to_v8(isolate, name);
+        return FilterResult(v8pp::to_v8(isolate, name));
       };
     } else {
       propertyFunc = makeFilter(property);
@@ -50,9 +54,9 @@ FilterFunc makeFilter(const json11::Json &json) {
     const FilterFunc &objectFunc = makeFilter(json["object"]);
 
     return FilterFunc([isolate, objectFunc,
-                       propertyFunc](Packet *pkt) -> v8::Local<v8::Value> {
-      v8::Local<v8::Value> value = objectFunc(pkt);
-      v8::Local<v8::Value> property = propertyFunc(pkt);
+                       propertyFunc](Packet *pkt) -> FilterResult {
+      v8::Local<v8::Value> value = objectFunc(pkt).value;
+      v8::Local<v8::Value> property = propertyFunc(pkt).value;
       v8::Local<v8::Value> result;
 
       const std::string &name =
@@ -88,10 +92,10 @@ FilterFunc makeFilter(const json11::Json &json) {
       }
 
       if (result.IsEmpty()) {
-        result = v8::Null(isolate);
+        return FilterResult(v8::Null(isolate));
       }
 
-      return result;
+      return FilterResult(result, value);
     });
   } else if (type == "BinaryExpression") {
     const FilterFunc &lf = makeFilter(json["left"]);
@@ -100,88 +104,97 @@ FilterFunc makeFilter(const json11::Json &json) {
 
     if (op == ">") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Boolean::New(isolate,
-                                fetchValue(lf(pkt))->NumberValue() >
-                                    fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Boolean::New(isolate, fetchValue(lf(pkt))->NumberValue() >
+                                          fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "<") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Boolean::New(isolate,
-                                fetchValue(lf(pkt))->NumberValue() <
-                                    fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Boolean::New(isolate, fetchValue(lf(pkt))->NumberValue() <
+                                          fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == ">=") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Boolean::New(isolate,
-                                fetchValue(lf(pkt))->NumberValue() >=
-                                    fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Boolean::New(isolate, fetchValue(lf(pkt))->NumberValue() >=
+                                          fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "<=") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Boolean::New(isolate,
-                                fetchValue(lf(pkt))->NumberValue() <=
-                                    fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Boolean::New(isolate, fetchValue(lf(pkt))->NumberValue() <=
+                                          fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "==") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Boolean::New(
-            isolate, fetchValue(lf(pkt))->Equals(fetchValue(rf(pkt))));
+        return FilterResult(v8::Boolean::New(
+            isolate, fetchValue(lf(pkt))->Equals(fetchValue(rf(pkt)))));
       });
     } else if (op == "!=") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Boolean::New(
-            isolate, !fetchValue(lf(pkt))->Equals(fetchValue(rf(pkt))));
+        return FilterResult(v8::Boolean::New(
+            isolate, !fetchValue(lf(pkt))->Equals(fetchValue(rf(pkt)))));
       });
     } else if (op == "+") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
-                                            fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
+                                         fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "-") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
-                                            fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
+                                         fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "*") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
-                                            fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
+                                         fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "/") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
-                                            fetchValue(rf(pkt))->NumberValue());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->NumberValue() +
+                                         fetchValue(rf(pkt))->NumberValue()));
       });
     } else if (op == "%") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() %
-                                            fetchValue(rf(pkt))->Int32Value());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() %
+                                         fetchValue(rf(pkt))->Int32Value()));
       });
     } else if (op == "&") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() &
-                                            fetchValue(rf(pkt))->Int32Value());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() &
+                                         fetchValue(rf(pkt))->Int32Value()));
       });
     } else if (op == "|") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() |
-                                            fetchValue(rf(pkt))->Int32Value());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() |
+                                         fetchValue(rf(pkt))->Int32Value()));
       });
     } else if (op == "^") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() ^
-                                            fetchValue(rf(pkt))->Int32Value());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() ^
+                                         fetchValue(rf(pkt))->Int32Value()));
       });
     } else if (op == ">>") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() >>
-                                            fetchValue(rf(pkt))->Int32Value());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value() >>
+                                         fetchValue(rf(pkt))->Int32Value()));
       });
     } else if (op == "<<") {
       return FilterFunc([isolate, lf, rf](Packet *pkt) {
-        return v8::Number::New(isolate,
-                               fetchValue(lf(pkt))->Int32Value()
-                                   << fetchValue(rf(pkt))->Int32Value());
+        return FilterResult(
+            v8::Number::New(isolate, fetchValue(lf(pkt))->Int32Value()
+                                         << fetchValue(rf(pkt))->Int32Value()));
       });
     }
   } else if (type == "Literal") {
@@ -212,14 +225,16 @@ FilterFunc makeFilter(const json11::Json &json) {
     const FilterFunc &lf = makeFilter(json["left"]);
     const FilterFunc &rf = makeFilter(json["right"]);
     if (op == "||") {
-      return FilterFunc([isolate, lf, rf](Packet *pkt) -> v8::Local<v8::Value> {
-        v8::Local<v8::Value> value = lf(pkt);
-        return fetchValue(value)->BooleanValue() ? value : rf(pkt);
+      return FilterFunc([isolate, lf, rf](Packet *pkt) {
+        v8::Local<v8::Value> value = lf(pkt).value;
+        return FilterResult(fetchValue(value)->BooleanValue() ? value
+                                                              : rf(pkt));
       });
     } else {
-      return FilterFunc([isolate, lf, rf](Packet *pkt) -> v8::Local<v8::Value> {
-        v8::Local<v8::Value> value = lf(pkt);
-        return !fetchValue(value)->BooleanValue() ? value : rf(pkt);
+      return FilterFunc([isolate, lf, rf](Packet *pkt) {
+        v8::Local<v8::Value> value = lf(pkt).value;
+        return FilterResult(!fetchValue(value)->BooleanValue() ? value
+                                                               : rf(pkt));
       });
     }
   } else if (type == "UnaryExpression") {
@@ -250,14 +265,19 @@ FilterFunc makeFilter(const json11::Json &json) {
     }
     return FilterFunc([isolate, cf,
                        argFuncs](Packet *pkt) -> v8::Local<v8::Value> {
-      v8::Local<v8::Value> func = cf(pkt);
+      FilterResult result = cf(pkt);
+      v8::Local<v8::Value> func = result.value;
       if (func->IsFunction()) {
         std::vector<v8::Local<v8::Value>> args;
         for (const FilterFunc &arg : argFuncs) {
-          args.push_back(arg(pkt));
+          args.push_back(arg(pkt).value);
         }
-        return func.As<v8::Object>()->CallAsFunction(
-            isolate->GetCurrentContext()->Global(), args.size(), args.data());
+        v8::Local<v8::Value> receiver = isolate->GetCurrentContext()->Global();
+        if (!result.parent.IsEmpty()) {
+          receiver = result.parent;
+        }
+        return func.As<v8::Object>()->CallAsFunction(receiver, args.size(),
+                                                     args.data());
       }
       return v8::Null(isolate);
     });
@@ -265,13 +285,13 @@ FilterFunc makeFilter(const json11::Json &json) {
     const FilterFunc &tf = makeFilter(json["test"]);
     const FilterFunc &cf = makeFilter(json["consequent"]);
     const FilterFunc &af = makeFilter(json["alternate"]);
-    return FilterFunc(
-        [isolate, tf, cf, af](Packet *pkt) -> v8::Local<v8::Value> {
-          return fetchValue(tf(pkt))->BooleanValue() ? cf(pkt) : af(pkt);
-        });
+    return FilterFunc([isolate, tf, cf, af](Packet *pkt) {
+      return FilterResult(fetchValue(tf(pkt))->BooleanValue() ? cf(pkt)
+                                                              : af(pkt));
+    });
   } else if (type == "Identifier") {
     const std::string &name = json["name"].string_value();
-    return FilterFunc([isolate, name](Packet *pkt) -> v8::Local<v8::Value> {
+    return FilterFunc([isolate, name](Packet *pkt) {
 
       v8::Local<v8::Value> key = v8pp::to_v8(isolate, name);
       v8::Local<v8::Object> pktObject =
@@ -280,7 +300,7 @@ FilterFunc makeFilter(const json11::Json &json) {
         pktObject = v8pp::class_<Packet>::reference_external(isolate, pkt);
       }
       if (pktObject->Has(key)) {
-        return pktObject->Get(key);
+        return FilterResult(pktObject->Get(key));
       }
 
       std::function<std::shared_ptr<Layer>(
@@ -310,22 +330,24 @@ FilterFunc makeFilter(const json11::Json &json) {
         v8::Local<v8::Object> layerObject =
             v8pp::class_<Layer>::find_object(isolate, layer.get());
         if (!layerObject.IsEmpty()) {
-          return layerObject;
+          return FilterResult(layerObject);
         }
-        return v8pp::class_<Layer>::reference_external(isolate, layer.get());
+        return FilterResult(
+            v8pp::class_<Layer>::reference_external(isolate, layer.get()));
       }
       if (name == "$") {
-        return pktObject;
+        return FilterResult(pktObject);
       }
       v8::Local<v8::Object> global = isolate->GetCurrentContext()->Global();
       if (global->Has(key)) {
-        return global->Get(key);
+        return FilterResult(global->Get(key));
       }
-      return v8::Null(isolate);
+      return FilterResult(v8::Null(isolate));
     });
   }
 
-  return FilterFunc([isolate](Packet *) { return v8::Null(isolate); });
+  return FilterFunc(
+      [isolate](Packet *) { return FilterResult(v8::Null(isolate)); });
 }
 
 FilterFunc makeFilter(const std::string &jsonstr) {
