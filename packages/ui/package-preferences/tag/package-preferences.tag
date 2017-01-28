@@ -52,11 +52,8 @@
       if (pkg.config.get('enabled')) {
         pkg.deactivate();
       }
-      Package.uninstall(pkg.name).then(() => {
-        $(e.target).parents('li.packages').fadeOut(400, () => {
-          this.packageList.splice(this.packageList.indexOf(pkg), 1);
-          this.update();
-        });
+      $(e.target).parents('li.packages').fadeOut(400, () => {
+        Package.uninstall(pkg.name);
       });
     }
   </script>
