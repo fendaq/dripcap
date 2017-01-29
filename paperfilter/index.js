@@ -27,7 +27,7 @@ function roll(script) {
       includePaths({extensions: ['.js', '.es']})
     ],
     onwarn: (e) => {
-      console.log(e)
+      console.warn(e.toString());
     }
   }).then((bundle) => {
     const result = bundle.generate({
