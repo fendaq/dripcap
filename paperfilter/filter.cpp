@@ -200,7 +200,7 @@ FilterFunc makeFilter(const json11::Json &json) {
   } else if (type == "Literal") {
     const json11::Json &regex = json["regex"];
     if (regex.is_object()) {
-      const std::string &value = json["value"].string_value();
+      const std::string &value = json["raw"].string_value();
       return FilterFunc([isolate, value](Packet *pkt) -> v8::Local<v8::Value> {
         Nan::MaybeLocal<Nan::BoundScript> script =
             Nan::CompileScript(v8pp::to_v8(isolate, value));
