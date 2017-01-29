@@ -63,6 +63,7 @@
     }
     .text-summary {
       padding: 0 10px;
+      color: var(--color-strings);
     }
     ul {
       padding-left: 20px;
