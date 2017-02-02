@@ -212,7 +212,8 @@ gulp.task('default', ['build'], cb => {
   let env = {
     DRIPCAP_ATTACH: '1'
   };
-  exec('electron --enable-logging .build', {
+  let electronPath = `${__dirname}/node_modules/.bin`
+  exec(`${electronPath}/electron --enable-logging .build`, {
     env: Object.assign(env, process.env)
   }, cb);
 });
