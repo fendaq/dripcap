@@ -28,5 +28,7 @@ base16-ocean
   --color-warn: var(--color-integers);
   --color-error: var(--color-variables);
 
+  --font-family: 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, 'Droid Sans Fallback', sans-serif;
+
   --vibrancy: 'dark';
 }
