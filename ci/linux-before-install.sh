@@ -1,7 +1,7 @@
 rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm
 (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
 source ~/.nvm/nvm.sh
-nvm install 7
+nvm install 7.4.0
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list

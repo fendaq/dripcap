@@ -1,6 +1,6 @@
 brew update
 brew install gpg jq yarn
-nvm install 7
+nvm install 7.4.0
 
 export PATH=/usr/local/opt/gnupg/libexec/gpgbin:$PATH
 export CC=clang
