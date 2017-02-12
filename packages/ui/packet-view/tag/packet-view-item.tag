@@ -116,10 +116,12 @@
   }
 
   rangeOut() {
+    e.preventUpdate = true;
     this.parent.rangeOut();
   }
 
   fieldRange(e) {
+    e.preventUpdate = true;
     this.parent.fieldRange(e);
   };
 
