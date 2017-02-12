@@ -280,11 +280,12 @@ export default class Dissector {
 
     layer.summary = `${src.data} -> ${dst.data} seq:${seq} ack:${ack}`;
 
+    let layerObject = new Layer(layer);
     let id = src.data + '/' + dst.data;
     let chunk = {
       namespace: parentLayer.namespace,
       id: id,
-      layer: layer,
+      layer: layerObject,
       attrs: {
         payload: layer.payload,
         seq: seq
@@ -295,6 +296,6 @@ export default class Dissector {
       chunk.end = true;
     }
 
-    return [new Layer(layer), new StreamChunk(chunk)];
+    return [layerObject, new StreamChunk(chunk)];
   }
 };
