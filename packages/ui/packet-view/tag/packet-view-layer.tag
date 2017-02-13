@@ -44,6 +44,7 @@
     };
 
     rangeOut(e) {
+      e.preventUpdate = true;
       PubSub.pub('packet-view:range', []);
     }
 
@@ -56,6 +57,7 @@
     }
 
     layerRange(e) {
+      e.preventUpdate = true;
       let range = this.range.split(' ');
       range.pop();
       PubSub.pub('packet-view:range', range);
