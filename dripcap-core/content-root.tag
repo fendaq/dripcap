@@ -32,7 +32,7 @@
   <drip-modal-view data-container-id="drip-modal"></drip-modal-view>
   <style type="text/less">
     * {
-      font-family: var(--font-family);
+      font-family: var(--font-family, 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, 'Droid Sans Fallback', sans-serif);
       font-size: 14px;
     }
 
