@@ -180,7 +180,7 @@
       }
 
       .darwin {
-        margin-top: 42px;
+        padding-top: 42px;
         background-color: transparent;
       }
 
