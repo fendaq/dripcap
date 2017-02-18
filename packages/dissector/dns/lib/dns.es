@@ -7,7 +7,7 @@ export default class DNSDissector {
   }
 
   analyze(packet, parentLayer) {
-    let confidence = 0.8;
+    let confidence = 0.9;
     if (parentLayer.getValue('srcPort').data !== 53 && parentLayer.getValue('dstPort').data !== 53) {
       confidence = 0.2;
     }
@@ -17,7 +17,7 @@ export default class DNSDissector {
       namespace: parentLayer.namespace + '::DNS',
       name: 'DNS',
       id: 'dns',
-      confidence: 0.8
+      confidence: confidence
     };
 
     let id = parentLayer.payload.readUInt16BE(0);
