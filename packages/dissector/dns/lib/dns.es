@@ -7,8 +7,9 @@ export default class DNSDissector {
   }
 
   analyze(packet, parentLayer) {
+    let confidence = 0.8;
     if (parentLayer.getValue('srcPort').data !== 53 && parentLayer.getValue('dstPort').data !== 53) {
-      return;
+      confidence = 0.2;
     }
 
     let layer = {
