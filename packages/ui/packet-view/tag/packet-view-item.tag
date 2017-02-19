@@ -115,7 +115,7 @@
     e.stopPropagation();
   }
 
-  rangeOut() {
+  rangeOut(e) {
     e.preventUpdate = true;
     this.parent.rangeOut();
   }
